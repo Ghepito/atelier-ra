@@ -141,7 +141,20 @@
     <li><b>Authentication</b> → Commencer → <b>Adresse e-mail/Mot de passe</b> → activer.</li>
     <li>Authentication → Paramètres → <b>Domaines autorisés</b> → ajouter <code>ghepito.github.io</code>.</li>
     <li><b>Firestore Database</b> → Créer → emplacement <b>europe-west9 (Paris)</b> → mode production.</li>
-    <li>Firestore → onglet <b>Règles</b> : coller les règles de sécurité fournies, puis <b>Publier</b>.</li>
+    <li>Firestore → onglet <b>Règles</b> : coller le contenu du fichier <a href="https://github.com/Ghepito/atelier-ra/blob/main/firestore.rules"><code>firestore.rules</code></a>, puis <b>Publier</b>.</li>
+  </ol>
+  <h3>Devenir administrateur (une seule fois)</h3>
+  <ol class="steps">
+    <li>Créer son compte dans l'<a href="espace.html">espace connecté</a> (sans code classe) : il est créé en « Apprenant ».</li>
+    <li>Console Firebase → <b>Firestore Database → Données</b> → collection <code>users</code> → ouvrir son document (repérable à son e-mail).</li>
+    <li>Modifier le champ <code>role</code> : remplacer <code>apprenant</code> par <code>admin</code>, puis enregistrer.</li>
+    <li>Recharger l'espace connecté : les onglets d'administration apparaissent. Les collègues formateurs se créent ensuite un compte, et l'administrateur les passe en « Formateur » dans l'onglet <b>Utilisateurs</b>.</li>
+  </ol>
+  <h3>Premier remplissage</h3>
+  <ol class="steps">
+    <li><b>Fiches machines → Initialiser les fiches depuis l'appli</b> : copie les 3 fiches actuelles dans la base.</li>
+    <li><b>Classes</b> : créer une classe ; transmettre son code aux apprenants.</li>
+    <li><b>Publier</b> : les téléphones reçoivent les fiches au prochain démarrage (bandeau bleu « Fiches mises à jour »).</li>
   </ol>
   <h3>Publication de l'appli et du portail</h3>
   <p>Le code est sur <a href="https://github.com/Ghepito/atelier-ra">GitHub</a>. Chaque modification recompile automatiquement l'APK (onglet <i>Actions</i>) et met à jour ce portail (GitHub Pages).</p>
