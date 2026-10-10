@@ -1,0 +1,48 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+
+android {
+    namespace "fr.atelier.ra"
+    compileSdkVersion 37
+
+    defaultConfig {
+        applicationId "fr.atelier.ra"
+        minSdkVersion 24
+        targetSdkVersion 37
+        versionCode 1
+        versionName '0.1'
+    }
+
+    signingConfigs {
+        // Clé fixe (prototype R&D) : permet d'installer chaque nouvelle version par-dessus l'ancienne.
+        atelier {
+            storeFile file('atelier-ra.keystore')
+            storePassword 'atelierra'
+            keyAlias 'atelierra'
+            keyPassword 'atelierra'
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.atelier
+        }
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.atelier
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+
+dependencies {
+    implementation 'com.google.ar:core:1.56.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+}

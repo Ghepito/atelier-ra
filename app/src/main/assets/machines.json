@@ -1,0 +1,64 @@
+{
+  "_aide": "Positions pos_cm mesurées depuis le CENTRE du marqueur posé à plat : x vers la droite (+), y au-dessus de la surface (+), z vers le bas du marqueur, côté opposé au bandeau HAUT (+).",
+  "machines": [
+    {
+      "id": "table",
+      "code": "TAB-01",
+      "nom": "Table de travail",
+      "image": "cibles/cible-table.png",
+      "fonction": {
+        "intro": "Structure passive : pas de chaîne d'énergie, mais une chaîne de transmission des efforts.",
+        "blocs": [
+          { "titre": "Recevoir", "texte": "Plateau : reçoit les charges posées (outils, pièces, poste)." },
+          { "titre": "Transmettre", "texte": "Ceinture et pieds : transmettent les efforts jusqu'au sol." },
+          { "titre": "Stabiliser", "texte": "Patins réglables : rattrapent les défauts du sol, protègent le revêtement." }
+        ]
+      },
+      "entretien": [
+        { "ou": "Coin avant gauche — fixation du pied", "action": "Contrôler le serrage de la visserie", "periode": "6 mois", "pos_cm": { "x": -50, "y": 0, "z": 5 } },
+        { "ou": "Coin avant droit — patin réglable", "action": "Vérifier l'horizontalité au niveau à bulle", "periode": "12 mois", "pos_cm": { "x": 50, "y": 0, "z": 5 } },
+        { "ou": "Plateau", "action": "Nettoyer, rechercher fissures et éclats", "periode": "Hebdomadaire", "pos_cm": { "x": 0, "y": 0, "z": -30 } }
+      ],
+      "securite": {
+        "titre": "Règles d'utilisation",
+        "etapes": [
+          "Charge maximale : 80 kg répartis (exemple).",
+          "Ne jamais monter ni s'asseoir sur la table.",
+          "Signaler tout jeu ou bruit au niveau des pieds.",
+          "Ne pas déplacer la table chargée."
+        ],
+        "note": "Contenu d'exemple — à remplacer par les données réelles de l'équipement."
+      }
+    },
+    {
+      "id": "bureau",
+      "code": "BUR-01",
+      "nom": "Bureau avec poste informatique",
+      "image": "cibles/cible-bureau.png",
+      "fonction": {
+        "intro": "Chaîne d'énergie du poste (vue simplifiée) :",
+        "blocs": [
+          { "titre": "Alimenter", "texte": "Réseau 230 V AC via la prise murale." },
+          { "titre": "Distribuer", "texte": "Multiprise avec interrupteur : commande l'ensemble du poste." },
+          { "titre": "Convertir", "texte": "Alimentation de l'unité centrale : 230 V AC → 12 / 5 V DC." },
+          { "titre": "Agir", "texte": "Écran, éclairage, ventilateurs : produisent l'effet attendu." }
+        ]
+      },
+      "entretien": [
+        { "ou": "Tiroir — glissières", "action": "Lubrifier (lubrifiant sec PTFE)", "periode": "12 mois", "pos_cm": { "x": 30, "y": -5, "z": 10 } },
+        { "ou": "Multiprise", "action": "Contrôle visuel : câble, fiche, échauffement", "periode": "6 mois", "pos_cm": { "x": -40, "y": -70, "z": -20 } },
+        { "ou": "Unité centrale — grille de ventilation", "action": "Dépoussiérer", "periode": "6 mois", "pos_cm": { "x": 50, "y": -40, "z": -10 } }
+      ],
+      "securite": {
+        "titre": "Mise en sécurité avant intervention",
+        "etapes": [
+          "SÉPARER : éteindre la multiprise puis débrancher la fiche de la prise murale.",
+          "CONDAMNER : garder la fiche sous son contrôle, visible depuis le poste d'intervention.",
+          "IDENTIFIER : s'assurer que c'est bien la fiche du poste concerné.",
+          "VÉRIFIER : tenter une mise en marche — rien ne doit s'allumer."
+        ],
+        "note": "Exemple pédagogique : l'affichage en réalité augmentée ne remplace ni la procédure officielle de consignation, ni l'habilitation."
+      }
+    }
+  ]
+}
