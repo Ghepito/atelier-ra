@@ -77,6 +77,8 @@ class ArrowView(context: Context, private val source: () -> FloatArray, private 
         canvas.drawCircle(bx, by, 13f * d, stroke)
         canvas.drawText(n.toString(), bx, by + 4.5f * d, txt)
         val dist = if (c[4] < 1f) "${(c[4] * 100).toInt()} cm" else String.format(Locale.FRANCE, "%.1f m", c[4])
-        canvas.drawText(if (behind) "$dist · derrière vous" else dist, bx, by + 30f * d, label)
+        val ly = if (by + 34f * d > height - margeBas) by - 20f * d else by + 30f * d
+        val lx = bx.coerceIn(70f * d, width - 70f * d)
+        canvas.drawText(if (behind) "$dist · derrière vous" else dist, lx, ly, label)
     }
 }

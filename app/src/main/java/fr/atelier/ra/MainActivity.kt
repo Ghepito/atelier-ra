@@ -108,8 +108,9 @@ class MainActivity : AppCompatActivity(), ArEvents {
     override fun etat(etat: Etat, machine: String?, message: String?) = runOnUiThread { majEtat(etat, machine, message) }
 
     override fun marqueurRetrouve(machine: String) = runOnUiThread {
+        val premier = current == null
         if (machine != current) choisirMachine(machine)
-        if (masque) montrerPanneau()
+        if (masque || premier) montrerPanneau()
     }
 
     override fun repereTouche(machine: String, index: Int) = runOnUiThread {
