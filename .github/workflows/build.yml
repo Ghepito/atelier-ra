@@ -69,7 +69,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release delete derniere-version --yes --cleanup-tag || true
-          gh release create derniere-version AtelierRA.apk \
+          gh release create derniere-version AtelierRA.apk marqueurs/marqueurs-appli.pdf \
             --title "Atelier RA — dernière version" \
-            --notes "Compilée automatiquement depuis le commit ${GITHUB_SHA::7}. Téléchargez AtelierRA.apk sur le téléphone puis ouvrez-le pour l'installer." \
+            --notes "Compilée automatiquement depuis le commit ${GITHUB_SHA::7}. Téléchargez AtelierRA.apk sur le téléphone puis ouvrez-le pour l'installer. Les marqueurs à imprimer sont dans marqueurs-appli.pdf." \
             --latest
