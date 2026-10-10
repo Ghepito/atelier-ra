@@ -36,6 +36,13 @@ Une nouvelle version s'installe par-dessus l'ancienne.
 - Onglet Entretien : toucher un point pour faire clignoter le repère correspondant.
 - ⚙ → « Réinitialiser le suivi » si les repères ont dérivé.
 
+## Équipements
+- **TAB-01** table, **BUR-01** bureau : marqueur à plat sur le dessus (exemples).
+- **POL-01 PolyProd (ERM)** : deux marqueurs verticaux de 12 cm, avant et arrière ; 18 repères (sécurité, commande,
+  énergie, préactionneurs, actionneurs, capteurs) ; 5 chaînes (action : dosage solide, obturateur, prise du bouchon,
+  convoyeur ; acquisition : dosage solide) ; consignation électrique + pneumatique guidée.
+  Les positions sont approximatives : les caler avec le mode placement 📍.
+
 ## Modifier le contenu
 Tout est dans `app/src/main/assets/machines.json`. Positions `pos_cm` mesurées depuis le **centre
 du marqueur** posé à plat :

@@ -66,8 +66,8 @@ class ArRenderer(
      */
     @Volatile var cible = FloatArray(5)
 
-    /** Machine dont la chaîne d'énergie est animée (null = aucune) */
-    @Volatile var animation: String? = null
+    /** Chaîne animée : (machine, index de la chaîne), null = aucune */
+    @Volatile var animation: Pair<String, Int>? = null
     /** Bloc fonctionnel actuellement parcouru par l'animation (-1 = aucun) */
     @Volatile var blocActif = -1
     /** Tous les repères localisés à cette image, avec leur distance */
@@ -89,7 +89,10 @@ class ArRenderer(
     private var height = 1
 
     private class Suivi(val key: String) {
-        var image: AugmentedImage? = null
+        /** Images (marqueurs) de cette machine connues d'ARCore, par index de cible */
+        val images = HashMap<Int, AugmentedImage>()
+        /** Index du dernier marqueur vu */
+        var cible = 0
         var anchor: Anchor? = null
         var lastFull = 0L
         var extent = 0.08f
@@ -200,13 +203,16 @@ class ArRenderer(
             var actif = -1
 
             for (sv in suivis.values) {
-                val img = sv.image
-                val full = img != null && img.trackingState == TrackingState.TRACKING &&
-                        img.trackingMethod == AugmentedImage.TrackingMethod.FULL_TRACKING
+                val machine = machines[sv.key] ?: continue
+                val vu = sv.images.entries.firstOrNull {
+                    it.value.trackingState == TrackingState.TRACKING &&
+                            it.value.trackingMethod == AugmentedImage.TrackingMethod.FULL_TRACKING
+                }
+                val full = vu != null
                 if (full && !sv.etaitVu) events.marqueurRetrouve(sv.key)
                 sv.etaitVu = full
                 val pose: Pose = when {
-                    full -> img!!.centerPose
+                    vu != null -> { sv.cible = vu.key; posMachine(machine, vu.key, vu.value) }
                     sv.anchor?.trackingState == TrackingState.TRACKING -> sv.anchor!!.pose
                     else -> { sv.pose = null; continue }
                 }
@@ -215,7 +221,8 @@ class ArRenderer(
                 if (current == null || sv.lastFull > current.lastFull) current = sv
                 val c = dessinerMachine(sv, pose, full, camPose, t)
                 if (c != null) nouvelleCible = c
-                if (animation == sv.key) actif = dessinerChaine(sv, pose, camPose, t)
+                val anim = animation
+                if (anim != null && anim.first == sv.key) actif = dessinerChaine(sv, anim.second, pose, camPose, t)
             }
             cible = nouvelleCible
             blocActif = actif
@@ -237,26 +244,40 @@ class ArRenderer(
         }
     }
 
+    /** Pose du repère machine déduite d'un de ses marqueurs. */
+    private fun posMachine(m: Machine, k: Int, img: AugmentedImage): Pose {
+        val c = m.cibles.getOrNull(k) ?: return img.centerPose
+        return img.centerPose.compose(c.pose.inverse())
+    }
+
     private fun mettreAJourImages(updated: Collection<AugmentedImage>) {
         val now = SystemClock.uptimeMillis()
         for (img in updated) {
-            val key = img.name
+            // Nom de l'image : "<machine>#<index du marqueur>"
+            val key = img.name.substringBefore('#')
+            val k = img.name.substringAfter('#', "0").toIntOrNull() ?: 0
+            val machine = machines[key] ?: continue
             when (img.trackingState) {
                 TrackingState.TRACKING -> {
                     val sv = suivis.getOrPut(key) { Suivi(key) }
-                    sv.image = img
+                    sv.images[k] = img
                     if (img.trackingMethod == AugmentedImage.TrackingMethod.FULL_TRACKING) {
                         sv.lastFull = now
+                        sv.cible = k
                         sv.extent = max(img.extentX, img.extentZ)
-                        val cp = img.centerPose
+                        val mp = posMachine(machine, k, img)
                         val a = sv.anchor
-                        if (a == null || a.trackingState != TrackingState.TRACKING || distance(a.pose, cp) > REANCRAGE_M) {
+                        if (a == null || a.trackingState != TrackingState.TRACKING || distance(a.pose, mp) > REANCRAGE_M) {
                             a?.detach()
-                            sv.anchor = img.createAnchor(cp)
+                            sv.anchor = img.createAnchor(mp)
                         }
                     }
                 }
-                TrackingState.STOPPED -> suivis.remove(key)?.anchor?.detach()
+                TrackingState.STOPPED -> {
+                    val sv = suivis[key] ?: continue
+                    sv.images.remove(k)
+                    if (sv.images.isEmpty()) suivis.remove(key)?.anchor?.detach()
+                }
                 else -> {}
             }
         }
@@ -268,7 +289,10 @@ class ArRenderer(
         pose.toMatrix(base, 0)
         var res: FloatArray? = null
 
-        Matrix.scaleM(model, 0, base, 0, sv.extent, 1f, sv.extent)
+        // Cadre sur le marqueur utilisé
+        val cib = machine.cibles.getOrNull(sv.cible)
+        (if (cib != null) pose.compose(cib.pose) else pose).toMatrix(tmp, 0)
+        Matrix.scaleM(model, 0, tmp, 0, sv.extent, 1f, sv.extent)
         Matrix.multiplyMM(mvp, 0, vp, 0, model, 0)
         flat.draw(frameMesh, mvp, if (full) FRAME_FULL else FRAME_SPACE)
 
@@ -354,10 +378,23 @@ class ArRenderer(
      * Chaîne d'énergie animée : maillons colorés par bloc fonctionnel, flux de particules
      * de maillon en maillon, étiquette « BLOC · organe ». Renvoie le bloc actif.
      */
-    private fun dessinerChaine(sv: Suivi, pose: Pose, camPose: Pose, t: Long): Int {
+    private val COULEURS_INFO = arrayOf(
+        floatArrayOf(0.29f, 0.66f, 1f, 1f),    // bleu
+        floatArrayOf(0.62f, 0.5f, 1f, 1f),     // violet
+        floatArrayOf(0.2f, 0.85f, 0.9f, 1f),   // cyan
+        floatArrayOf(0.95f, 0.45f, 0.85f, 1f), // rose
+    )
+    private val COULEURS_INFO_ETIQ = intArrayOf(
+        android.graphics.Color.rgb(74, 168, 255), android.graphics.Color.rgb(158, 128, 255),
+        android.graphics.Color.rgb(51, 217, 230), android.graphics.Color.rgb(242, 115, 217))
+
+    private fun dessinerChaine(sv: Suivi, index: Int, pose: Pose, camPose: Pose, t: Long): Int {
         val machine = machines[sv.key] ?: return -1
-        val ch = machine.chaine
+        val chaine = machine.chaines.getOrNull(index) ?: return -1
+        val ch = chaine.maillons
         if (ch.isEmpty()) return -1
+        val pal = if (chaine.acquisition) COULEURS_INFO else COULEURS_BLOCS
+        val palEtiq = if (chaine.acquisition) COULEURS_INFO_ETIQ else COULEURS_ETIQ
         pose.toMatrix(base, 0)
         val pts = ch.map { c ->
             val r = c.repere
@@ -371,7 +408,7 @@ class ArRenderer(
             val a = pts[k]; val b = pts[k + 1]
             val dx = b[0] - a[0]; val dy = b[1] - a[1]; val dz = b[2] - a[2]
             val len = sqrt(dx * dx + dy * dy + dz * dz)
-            val col = COULEURS_BLOCS[ch[k].bloc.coerceAtLeast(0) % COULEURS_BLOCS.size]
+            val col = pal[ch[k].bloc.coerceAtLeast(0) % pal.size]
             val sombre = floatArrayOf(col[0] * 0.45f, col[1] * 0.45f, col[2] * 0.45f, 1f)
             val n = (len / 0.035f).toInt().coerceAtLeast(2)
             for (j in 1 until n) {
@@ -389,14 +426,14 @@ class ArRenderer(
         camPose.toMatrix(tmp, 0)
         ch.forEachIndexed { k, c ->
             val p = pts[k]
-            val col = COULEURS_BLOCS[c.bloc.coerceAtLeast(0) % COULEURS_BLOCS.size]
+            val col = pal[c.bloc.coerceAtLeast(0) % pal.size]
             val actif = k == actifIdx
             val taille = if (actif) 0.026f * (1.15f + 0.15f * sin(t / 120.0).toFloat()) else 0.02f
             cubeEn(p[0], p[1], p[2], taille, col)
 
-            val titre = machine.blocs.getOrNull(c.bloc)?.titre?.uppercase() ?: ""
+            val titre = chaine.blocs.getOrNull(c.bloc)?.titre?.uppercase() ?: ""
             val texte = if (titre.isNotEmpty()) "$titre · ${c.nom}" else c.nom
-            val (tex, ratio) = if (actif) TextTextures.get(texte, COULEURS_ETIQ[c.bloc.coerceAtLeast(0) % COULEURS_ETIQ.size], android.graphics.Color.rgb(29, 20, 0))
+            val (tex, ratio) = if (actif) TextTextures.get(texte, palEtiq[c.bloc.coerceAtLeast(0) % palEtiq.size], android.graphics.Color.rgb(29, 20, 0))
                                else TextTextures.get(texte, android.graphics.Color.argb(230, 16, 26, 31), android.graphics.Color.WHITE)
             vIn[0] = p[0]; vIn[1] = p[1] + 0.045f; vIn[2] = p[2]; vIn[3] = 1f
             Matrix.multiplyMV(vOut, 0, base, 0, vIn, 0)

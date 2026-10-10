@@ -415,32 +415,67 @@ class MainActivity : AppCompatActivity(), ArEvents {
 
     private val couleursBlocs = intArrayOf(
         Color.rgb(255, 107, 74), Color.rgb(255, 176, 32), Color.rgb(245, 230, 99), Color.rgb(60, 207, 142), Color.rgb(74, 168, 255))
+    private val couleursInfo = intArrayOf(
+        Color.rgb(74, 168, 255), Color.rgb(158, 128, 255), Color.rgb(51, 217, 230), Color.rgb(242, 115, 217))
+    /** Chaîne affichée, par machine */
+    private val chaineChoisie = HashMap<String, Int>()
 
     private fun ongletFonction(m: Machine) {
-        val anime = renderer.animation == m.key
-        if (m.chaine.isNotEmpty()) {
+        if (m.chaines.isEmpty()) {
+            content.addView(text("Aucune chaîne décrite pour cet équipement.", 14f, MUT)); return
+        }
+        val idx = (chaineChoisie[m.key] ?: 0).coerceIn(0, m.chaines.size - 1)
+        val ch = m.chaines[idx]
+
+        // Sélecteur de chaîne (défilement horizontal)
+        if (m.chaines.size > 1) {
+            val hs = android.widget.HorizontalScrollView(this).apply { isHorizontalScrollBarEnabled = false }
+            val row = LinearLayout(this).apply { orientation = LinearLayout.HORIZONTAL }
+            m.chaines.forEachIndexed { i, c ->
+                val on = i == idx
+                val coul = if (c.acquisition) SPACE else ACC
+                row.addView(text((if (c.acquisition) "◉ " else "⚡ ") + c.titre, 12.5f, if (on) DARK else TXT, true).apply {
+                    setPadding(dpi(12), dpi(7), dpi(12), dpi(7))
+                    background = if (on) rounded(coul, 99f) else rounded(Color.TRANSPARENT, 99f, LINE)
+                    setOnClickListener {
+                        chaineChoisie[m.key] = i
+                        if (renderer.animation?.first == m.key) renderer.animation = Pair(m.key, i)
+                        dernierBloc = -2
+                        afficher()
+                    }
+                }, LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply { rightMargin = dpi(6) })
+            }
+            hs.addView(row)
+            content.addView(hs, lp(bottom = 8))
+        }
+
+        val anime = renderer.animation?.let { it.first == m.key && it.second == idx } == true
+        if (ch.maillons.isNotEmpty()) {
             content.addView(bouton(if (anime) "■  Arrêter l'animation" else "▶  Voir la chaîne sur la machine",
-                if (anime) Color.argb(30, 255, 255, 255) else ACC, if (anime) TXT else DARK) {
-                renderer.animation = if (anime) null else m.key
+                if (anime) Color.argb(30, 255, 255, 255) else (if (ch.acquisition) SPACE else ACC), if (anime) TXT else DARK) {
+                renderer.animation = if (anime) null else Pair(m.key, idx)
                 dernierBloc = -2
                 afficher()
             }, lp(bottom = 8))
-            if (anime) content.addView(text("Le flux circule de maillon en maillon sur la machine ; le bloc parcouru s'allume ci-dessous.", 12.5f, MUT), lp(bottom = 6))
+            if (anime) content.addView(text(
+                if (ch.acquisition) "L'information circule du capteur vers la partie commande ; le bloc parcouru s'allume ci-dessous."
+                else "L'énergie circule de maillon en maillon sur la machine ; le bloc parcouru s'allume ci-dessous.", 12.5f, MUT), lp(bottom = 6))
         }
-        content.addView(text(m.fonctionIntro, 14f, MUT).apply { setPadding(0, 0, 0, dpi(8)) })
+        if (ch.intro.isNotBlank()) content.addView(text(ch.intro, 14f, MUT).apply { setPadding(0, 0, 0, dpi(8)) })
         val actif = if (anime) renderer.blocActif else -1
-        m.blocs.forEachIndexed { i, b ->
+        val pal = if (ch.acquisition) couleursInfo else couleursBlocs
+        ch.blocs.forEachIndexed { i, b ->
             if (i > 0) content.addView(text("▼", 11f, MUT).apply { gravity = Gravity.CENTER })
-            val coul = couleursBlocs[i % couleursBlocs.size]
+            val coul = pal[i % pal.size]
             val on = i == actif
             val card = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
                 setPadding(dpi(12), dpi(8), dpi(10), dpi(8))
                 background = if (on) rounded(Color.argb(60, Color.red(coul), Color.green(coul), Color.blue(coul)), 8f, coul)
-                             else rounded(Color.argb(20, 255, 176, 32), 8f, LINE)
+                             else rounded(Color.argb(20, Color.red(coul), Color.green(coul), Color.blue(coul)), 8f, LINE)
             }
-            val organes = m.chaine.filter { it.bloc == i }.joinToString(", ") { it.nom }
-            card.addView(text(b.titre.uppercase() + if (organes.isNotEmpty() && anime) "  ·  $organes" else "", 12f, if (anime) coul else ACC, true))
+            val organes = ch.maillons.filter { it.bloc == i }.joinToString(", ") { it.nom }
+            card.addView(text(b.titre.uppercase() + if (organes.isNotEmpty()) "  ·  $organes" else "", 12f, coul, true))
             card.addView(text(b.texte, 14f))
             content.addView(card, lp(top = 2, bottom = 2))
         }
@@ -488,7 +523,7 @@ class MainActivity : AppCompatActivity(), ArEvents {
             val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
             col.addView(text(p.ou, 14f, bold = true))
             col.addView(text(p.action, 13f, MUT))
-            val tag = "⟳ ${p.periode}" + if (store.estPlace(m.key, i)) "  ·  📍 placé" else ""
+            val tag = (if (p.type.isNotBlank()) p.type.uppercase() + "  ·  " else "") + "⟳ ${p.periode}" + if (store.estPlace(m.key, i)) "  ·  📍 placé" else ""
             col.addView(text(tag, 11f, TXT).apply {
                 setPadding(dpi(7), dpi(1), dpi(7), dpi(1))
                 background = rounded(Color.argb(26, 255, 255, 255), 99f)
@@ -619,7 +654,7 @@ class MainActivity : AppCompatActivity(), ArEvents {
     private fun reglages() {
         val taille = prefs.getInt("taille_cm", 8)
         val items = arrayOf(
-            "Taille des marqueurs imprimés : $taille cm",
+            "Taille des marqueurs table / bureau : $taille cm",
             "Rayon de la liste « À proximité » : ${fmtM(rayon)}",
             if (modePlacement) "Mode placement des repères : ACTIVÉ" else "Mode placement des repères : désactivé",
             "Exporter les positions (fichier machines.json)",
@@ -789,9 +824,11 @@ class MainActivity : AppCompatActivity(), ArEvents {
         val largeur = prefs.getInt("taille_cm", 8) / 100f
         val db = AugmentedImageDatabase(s)
         for (m in machines.values) {
-            assets.open(m.image).use { input ->
-                val bmp = BitmapFactory.decodeStream(input)
-                db.addImage(m.key, bmp, largeur)
+            m.cibles.forEachIndexed { k, c ->
+                assets.open(c.image).use { input ->
+                    val bmp = BitmapFactory.decodeStream(input)
+                    db.addImage("${m.key}#$k", bmp, c.largeurCm?.let { it / 100f } ?: largeur)
+                }
             }
         }
         val config = Config(s).apply {
