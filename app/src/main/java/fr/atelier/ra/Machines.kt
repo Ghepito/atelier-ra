@@ -18,6 +18,9 @@ data class PointEntretien(
 
 data class Bloc(val titre: String, val texte: String)
 
+/** Étape de procédure ; `repere` = index (0, 1, …) du point d'entretien à montrer, ou null. */
+data class Etape(val texte: String, val repere: Int?)
+
 data class Machine(
     val key: String,
     val code: String,
@@ -27,7 +30,7 @@ data class Machine(
     val blocs: List<Bloc>,
     val entretien: List<PointEntretien>,
     val securiteTitre: String,
-    val etapes: List<String>,
+    val etapes: List<Etape>,
     val note: String,
 )
 
@@ -52,7 +55,13 @@ object Machines {
                     )
                 }
             }
-            val etapes = s.getJSONArray("etapes").let { a -> (0 until a.length()).map { a.getString(it) } }
+            val etapes = s.getJSONArray("etapes").let { a ->
+                (0 until a.length()).map {
+                    val e = a.opt(it)
+                    if (e is JSONObject) Etape(e.getString("texte"), if (e.has("repere")) e.getInt("repere") - 1 else null)
+                    else Etape(e.toString(), null)
+                }
+            }
             Machine(
                 key = o.getString("id"),
                 code = o.getString("code"),

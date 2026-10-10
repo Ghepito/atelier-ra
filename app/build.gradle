@@ -9,8 +9,10 @@ android {
         applicationId "fr.atelier.ra"
         minSdkVersion 24
         targetSdkVersion 35
-        versionCode 1
-        versionName '0.1'
+        // Numéro de version = numéro de compilation GitHub (1 en local)
+        def numero = (System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInteger()
+        versionCode numero
+        versionName "0.$numero"
     }
 
     signingConfigs {
@@ -31,6 +33,10 @@ android {
             minifyEnabled false
             signingConfig signingConfigs.atelier
         }
+    }
+
+    buildFeatures {
+        buildConfig true
     }
 
     compileOptions {
