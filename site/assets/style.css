@@ -239,3 +239,17 @@ input[type=number] { font-family: "JetBrains Mono", monospace; }
 }
 
 body.connecte #presentation { display: none; }
+
+/* ---------- Jumeau 3D */
+.j3d-wrap { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 12px; margin-top: 8px; }
+.j3d { height: 560px; border-radius: 12px; border: 1px solid var(--line); overflow: hidden; background: #E6EBEE; }
+.j3d-side { display: flex; flex-direction: column; min-height: 0; }
+.j3d-list { display: flex; flex-direction: column; gap: 4px; overflow: auto; max-height: 430px; padding-right: 4px; }
+.j3d-pt { display: flex; align-items: center; gap: 10px; text-align: left; border: 1px solid var(--line); background: var(--card); color: var(--txt);
+  border-radius: 10px; padding: 7px 9px; font: 500 14px "Archivo", sans-serif; cursor: pointer; }
+.j3d-pt .num { flex: none; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--acc); color: var(--acc-ink); font: 800 12px "Archivo", sans-serif; }
+.j3d-pt:hover { border-color: var(--acc); }
+.j3d-pt.on { border-color: var(--warn); background: color-mix(in srgb, var(--warn) 12%, var(--card)); }
+.j3d-pt.on .num { background: var(--warn); color: #fff; }
+.j3d-pt.sel { border-color: var(--txt); }
+@media (max-width: 860px) { .j3d-wrap { grid-template-columns: 1fr; } .j3d { height: 420px; } }

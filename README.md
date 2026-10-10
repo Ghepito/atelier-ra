@@ -27,6 +27,7 @@ Une nouvelle version s'installe par-dessus l'ancienne.
 - **Mode placement** (⚙) : toucher 📍 puis l'endroit réel pour positionner un repère ; « Exporter les positions » renvoie le fichier `machines.json` à jour.
 - **À proximité (⌖)** : liste de tous les points localisés dans un rayon réglable (⚙), du plus proche au plus lointain ; toucher un point le sélectionne et la flèche y guide.
 - **Chaîne d'énergie animée** (onglet Fonction → ▶) : flux coloré de maillon en maillon directement sur la machine, synchronisé avec les blocs fonctionnels.
+- **Jumeau numérique 3D** (portail) : placer les repères en cliquant sur une maquette 3D de la machine, puis publier.
 - **Avis de mise à jour** : un bandeau signale qu'une nouvelle version est disponible.
 
 ## Utilisation

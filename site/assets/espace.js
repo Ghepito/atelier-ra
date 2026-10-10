@@ -9,6 +9,8 @@ import {
   getDocs, serverTimestamp, runTransaction,
 } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
+import { chargerModele, creerJumeau } from "./jumeau.js";
+
 const firebaseConfig = {
   apiKey: "AIzaSyDsBpRo_4ICgHMMhReDO5ycB73BXxBjAKI",
   authDomain: "atelier-ra.firebaseapp.com",
@@ -27,7 +29,9 @@ const E = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&l
 const racine = $("#app");
 
 let user = null, profil = null, vue = null;
-let inscription = false;    // évite la création d'un profil par défaut pendant l'inscription
+let inscription = false;
+let jumeau = null;          // vue 3D active (une seule à la fois)
+const fermerJumeau = () => { if (jumeau) { jumeau.dispose(); jumeau = null; } };    // évite la création d'un profil par défaut pendant l'inscription
 let machines = [];          // [{id, data}]
 const ROLES = { apprenant: "Apprenant", formateur: "Formateur", admin: "Administrateur" };
 const STATUTS = { a_valider: "À valider", integree: "Intégrée", a_reprendre: "À reprendre" };
@@ -134,7 +138,7 @@ async function chargerProfil() {
 
 function onglets() {
   const t = [];
-  if (!estFormateur()) t.push(["nouveau", "Nouveau relevé"], ["mes", "Mes relevés"]);
+  if (!estFormateur()) t.push(["nouveau", "Nouveau relevé"], ["mes", "Mes relevés"], ["jumeau", "Jumeau 3D"]);
   if (estFormateur()) t.push(["valider", "À valider"], ["fiches", "Fiches machines"], ["classes", "Classes"], ["publier", "Publier"]);
   if (estAdmin()) t.push(["users", "Utilisateurs"]);
   t.push(["compte", "Mon compte"]);
@@ -142,6 +146,7 @@ function onglets() {
 }
 
 async function rendre() {
+  fermerJumeau();
   racine.innerHTML = `
     <div class="who"><h1>Bonjour ${E(profil.nom)}</h1><span class="badge ${profil.role}">${ROLES[profil.role] || profil.role}</span>
       <span style="margin-left:auto"></span><button class="btn ghost sm" id="deco">Se déconnecter</button></div>
@@ -151,7 +156,7 @@ async function rendre() {
   $$(".subnav button").forEach(b => b.onclick = () => { vue = b.dataset.v; rendre(); });
   try {
     await chargerMachines();
-    const V = { nouveau: vueNouveau, mes: vueMes, valider: vueValider, fiches: vueFiches, classes: vueClasses, publier: vuePublier, users: vueUsers, compte: vueCompte };
+    const V = { jumeau: vueJumeau, nouveau: vueNouveau, mes: vueMes, valider: vueValider, fiches: vueFiches, classes: vueClasses, publier: vuePublier, users: vueUsers, compte: vueCompte };
     await (V[vue] || vueCompte)($("#vue"));
     if (estFormateur()) compterAValider();
   } catch (e) {
@@ -402,10 +407,29 @@ async function vueFiches(el) {
   }
   const id = edition?.id && machines.find(x => x.id === edition.id) ? edition.id : machines[0].id;
   if (!edition || edition.id !== id) edition = { id, m: normaliser(structuredClone(machines.find(x => x.id === id).data)), sale: false };
+  edition.modele = await chargerModele(edition.id);
   dessinerEditeur(el);
 }
 
+const pointsJumeau = m => m.entretien.map(p => ({ x: +(p.pos_cm?.x ?? 0), y: +(p.pos_cm?.y ?? 0), z: +(p.pos_cm?.z ?? 0), ou: p.ou }));
+
+function sectionJumeau(m, editable) {
+  return `
+  <div class="j3d-wrap">
+    <div id="j3d" class="j3d"></div>
+    <div class="j3d-side">
+      <div class="row" style="margin:0 0 8px;gap:6px">${[["iso", "3D"], ["face", "Face"], ["gauche", "Gauche"], ["droite", "Droite"], ["dessus", "Dessus"], ["arriere", "Arrière"]]
+        .map(([k, t]) => `<button class="btn sm ghost" data-vue="${k}">${t}</button>`).join("")}</div>
+      <div id="j3d-msg" class="note" style="margin:0 0 8px">${editable
+        ? "Choisissez un repère ci-dessous, puis cliquez sur la maquette à l'endroit de l'organe."
+        : "Faites tourner la maquette, survolez les organes, touchez un repère numéroté."}</div>
+      <div class="j3d-list">${m.entretien.map((p, i) => `<button class="j3d-pt" data-pl="${i}"><span class="num">${i + 1}</span><span>${E(p.ou || "(sans nom)")}</span></button>`).join("")}</div>
+    </div>
+  </div>`;
+}
+
 function dessinerEditeur(el) {
+  fermerJumeau();
   const m = edition.m;
   const nPts = m.entretien.length, nPlaces = m.entretien.filter(p => p.pos_cm && (p.pos_cm.x || p.pos_cm.y || p.pos_cm.z)).length;
   const nComplets = m.entretien.filter(p => p.ou && p.action && p.periode).length;
@@ -423,6 +447,10 @@ function dessinerEditeur(el) {
     <div style="margin-top:14px" class="m">Complétude ${score} % · ${nPts} repères (${nComplets} complets) · ${m.chaines.length} chaîne(s) · ${m.securite.etapes.length} étape(s) de sécurité</div>
     <div class="progress" style="margin-top:6px"><i style="width:${score}%"></i></div>
   </div>
+
+  ${edition.modele ? `<div class="ed-sec"><h3>Jumeau numérique 3D <span class="m" style="font-weight:400">— placer les repères sur la maquette</span></h3>
+    ${sectionJumeau(m, true)}
+    <p class="m">Maquette simplifiée : la précision dépend de la maquette (quelques cm). Retouche fine possible avec 📍 dans l'appli. N'oubliez pas d'<b>enregistrer</b> puis de <b>publier</b>.</p></div>` : ""}
 
   <div class="ed-sec"><h3>Marqueurs <span class="m" style="font-weight:400">(position et orientation dans le repère machine)</span></h3>
     ${(m.cibles || []).map((c, i) => `
@@ -499,6 +527,7 @@ function dessinerEditeur(el) {
 
   <div class="sticky-bar">
     <button class="btn" id="save">Enregistrer le brouillon</button>
+    ${estAdmin() ? `<button class="btn ghost sm" id="reinit" title="Recharge la fiche telle qu'elle est dans l'appli (positions par défaut à jour)">Recharger la fiche d'origine</button>` : ""}
     <span class="m" id="etat">${edition.sale ? "Modifications non enregistrées" : "À jour"}</span>
     <span style="margin-left:auto" class="m">Les apprenants voient les fiches enregistrées ; l'appli voit la dernière version <b>publiée</b>.</span>
   </div>`;
@@ -506,13 +535,14 @@ function dessinerEditeur(el) {
   $("#choix").onchange = e => {
     if (edition.sale && !confirm("Abandonner les modifications non enregistrées ?")) { e.target.value = edition.id; return; }
     edition = { id: e.target.value, m: normaliser(structuredClone(machines.find(x => x.id === e.target.value).data)), sale: false };
-    dessinerEditeur(el);
+    chargerModele(edition.id).then(mod => { edition.modele = mod; dessinerEditeur(el); });
   };
   $$("[data-p]", el).forEach(i => i.oninput = () => {
     let v = i.value;
     if (i.hasAttribute("data-num")) v = v === "" ? null : Number(v);
     setP(edition.m, i.dataset.p, v);
     edition.sale = true; $("#etat").textContent = "Modifications non enregistrées";
+    if (jumeau && /^entretien\.\d+\.(pos_cm|ou)/.test(i.dataset.p)) jumeau.setPoints(pointsJumeau(edition.m));
   });
   $$("[data-del]", el).forEach(b => b.onclick = () => {
     const ks = b.dataset.del.split("."); const idx = Number(ks.pop());
@@ -538,6 +568,18 @@ function dessinerEditeur(el) {
       edition.sale = true; toast(n + " position(s) importée(s) — pensez à enregistrer"); dessinerEditeur(el);
     } catch (e) { toast("Import impossible : " + e.message); }
   };
+  const ri = $("#reinit");
+  if (ri) ri.onclick = async () => {
+    if (!confirm("Remplacer le brouillon de cette fiche par la version d'origine de l'appli ? (rien n'est enregistré tant que vous ne cliquez pas sur « Enregistrer »)")) return;
+    const j = await (await fetch("data/machines.json", { cache: "no-store" })).json();
+    const src = j.machines.find(x => x.id === edition.id);
+    if (!src) { toast("Fiche absente de l'appli"); return; }
+    const { id, ...reste } = normaliser(structuredClone(src));
+    edition.m = { ...reste, ordre: edition.m.ordre }; edition.sale = true; dessinerEditeur(el);
+    toast("Fiche d'origine chargée — pensez à enregistrer");
+  };
+  if (edition.modele) brancherJumeau(edition.m, true);
+
   $("#save").onclick = async () => {
     try {
       const propre = nettoyer(structuredClone(edition.m));
@@ -548,6 +590,67 @@ function dessinerEditeur(el) {
       dessinerEditeur(el);
     } catch (e) { toast(erreurFr(e)); }
   };
+}
+
+function brancherJumeau(m, editable, surSelection) {
+  const msg = $("#j3d-msg");
+  const marquer = i => $$(".j3d-pt").forEach(b => b.classList.toggle("on", Number(b.dataset.pl) === i));
+  jumeau = creerJumeau($("#j3d"), {
+    modele: edition && editable ? edition.modele : surSelection.modele,
+    points: pointsJumeau(m),
+    editable,
+    onPlace: (i, pos, nom) => {
+      setP(m, `entretien.${i}.pos_cm`, pos);
+      ["x", "y", "z"].forEach(k => { const f = $(`[data-p="entretien.${i}.pos_cm.${k}"]`); if (f) f.value = pos[k]; });
+      edition.sale = true; $("#etat").textContent = "Modifications non enregistrées";
+      msg.innerHTML = `✓ Repère ${i + 1} placé sur <b>${E(nom || "la maquette")}</b> (x ${pos.x}, y ${pos.y}, z ${pos.z}). Choisissez le suivant ou enregistrez.`;
+      marquer(-1);
+    },
+    onSelect: i => {
+      marquer(-1);
+      $$(".j3d-pt").forEach(b => b.classList.toggle("sel", Number(b.dataset.pl) === i));
+      if (surSelection) surSelection.afficher(i);
+      else msg.innerHTML = `Repère ${i + 1} : <b>${E(m.entretien[i]?.ou || "")}</b>. Cliquez sur « ${i + 1} » dans la liste pour le replacer.`;
+    },
+  });
+  $$("[data-vue]").forEach(b => b.onclick = () => jumeau.vue(b.dataset.vue));
+  $$(".j3d-pt").forEach(b => b.onclick = () => {
+    const i = Number(b.dataset.pl);
+    if (editable) {
+      jumeau.placer(i); marquer(i);
+      msg.innerHTML = `Cliquez sur la maquette à l'endroit du repère <b>${i + 1} · ${E(m.entretien[i]?.ou || "")}</b>.`;
+    } else {
+      jumeau.setSelection(i);
+      $$(".j3d-pt").forEach(x => x.classList.toggle("sel", x === b));
+      surSelection.afficher(i);
+    }
+  });
+}
+
+// ======================================================================= Apprenant : jumeau 3D (consultation)
+async function vueJumeau(el) {
+  const dispo = [];
+  for (const m of machines) if (await chargerModele(m.id)) dispo.push(m);
+  if (!dispo.length) { el.innerHTML = `<div class="note">Aucune machine n'a encore de maquette 3D.</div>`; return; }
+  const id = el.dataset.m && dispo.find(x => x.id === el.dataset.m) ? el.dataset.m : dispo[0].id;
+  const m = normaliser(structuredClone(dispo.find(x => x.id === id).data));
+  const modele = await chargerModele(id);
+  el.innerHTML = `
+    <div class="row" style="margin:0 0 10px"><select id="jm" style="max-width:360px">${dispo.map(x => `<option value="${x.id}" ${x.id === id ? "selected" : ""}>${E(x.data.code)} — ${E(x.data.nom)}</option>`).join("")}</select>
+      <span class="m">Préparez votre intervention : repérez les organes avant d'aller à la machine.</span></div>
+    ${sectionJumeau(m, false)}
+    <div class="card" id="jdet" style="margin-top:14px"><p class="m" style="margin:0">Touchez un repère pour afficher sa fiche.</p></div>`;
+  $("#jm").onchange = e => { el.dataset.m = e.target.value; fermerJumeau(); vueJumeau(el); };
+  brancherJumeau(m, false, {
+    modele,
+    afficher: i => {
+      const p = m.entretien[i]; if (!p) return;
+      $("#jdet").innerHTML = `<div class="eyebrow">Repère ${i + 1}${p.type ? " · " + E(p.type) : ""}</div>
+        <h3 style="margin:4px 0">${E(p.ou)}</h3>
+        <div class="kv"><b>Entretien</b><span>${E(p.action)}</span><b>Périodicité</b><span>${E(p.periode)}</span>
+        ${p.infos ? `<b>Informations</b><span style="white-space:pre-line">${E(p.infos)}</span>` : ""}</div>`;
+    },
+  });
 }
 
 /** Retire les champs vides et normalise les numéros avant enregistrement / publication. */

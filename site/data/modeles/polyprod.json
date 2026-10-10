@@ -1,0 +1,757 @@
+{
+ "machine": "polyprod",
+ "unite": "cm",
+ "sol": -75,
+ "note": "Maquette simplifiée d'après la vue CAO ERM ; dimensions hors tout 2750 × 1120 × 2300 mm. Repère : origine = centre du marqueur AV (75 cm du sol), x vers la droite vu de face, y vers le haut, z vers l'opérateur.",
+ "marqueurs": [
+  {
+   "image": "data/cibles/cible-polyprod-av.png",
+   "c": [
+    0,
+    0,
+    0.3
+   ],
+   "taille": 12,
+   "face": "avant"
+  },
+  {
+   "image": "data/cibles/cible-polyprod-ar.png",
+   "c": [
+    0,
+    0,
+    -112.3
+   ],
+   "taille": 12,
+   "face": "arriere"
+  }
+ ],
+ "pieces": [
+  {
+   "t": "box",
+   "nom": "Pied du bâti",
+   "c": [
+    -97,
+    -30,
+    -3
+   ],
+   "s": [
+    5,
+    90,
+    5
+   ],
+   "col": "#AEB6BC"
+  },
+  {
+   "t": "cyl",
+   "nom": "Patin",
+   "c": [
+    -97,
+    -73,
+    -3
+   ],
+   "r": 4,
+   "h": 4,
+   "col": "#2B2F33",
+   "axe": "y"
+  },
+  {
+   "t": "box",
+   "nom": "Pied du bâti",
+   "c": [
+    -97,
+    -30,
+    -109
+   ],
+   "s": [
+    5,
+    90,
+    5
+   ],
+   "col": "#AEB6BC"
+  },
+  {
+   "t": "cyl",
+   "nom": "Patin",
+   "c": [
+    -97,
+    -73,
+    -109
+   ],
+   "r": 4,
+   "h": 4,
+   "col": "#2B2F33",
+   "axe": "y"
+  },
+  {
+   "t": "box",
+   "nom": "Pied du bâti",
+   "c": [
+    97,
+    -30,
+    -3
+   ],
+   "s": [
+    5,
+    90,
+    5
+   ],
+   "col": "#AEB6BC"
+  },
+  {
+   "t": "cyl",
+   "nom": "Patin",
+   "c": [
+    97,
+    -73,
+    -3
+   ],
+   "r": 4,
+   "h": 4,
+   "col": "#2B2F33",
+   "axe": "y"
+  },
+  {
+   "t": "box",
+   "nom": "Pied du bâti",
+   "c": [
+    97,
+    -30,
+    -109
+   ],
+   "s": [
+    5,
+    90,
+    5
+   ],
+   "col": "#AEB6BC"
+  },
+  {
+   "t": "cyl",
+   "nom": "Patin",
+   "c": [
+    97,
+    -73,
+    -109
+   ],
+   "r": 4,
+   "h": 4,
+   "col": "#2B2F33",
+   "axe": "y"
+  },
+  {
+   "t": "box",
+   "nom": "Plateau",
+   "c": [
+    0,
+    15,
+    -56
+   ],
+   "s": [
+    200,
+    4,
+    112
+   ],
+   "col": "#C9CFD3"
+  },
+  {
+   "t": "box",
+   "nom": "Traverse basse",
+   "c": [
+    0,
+    -60,
+    -56
+   ],
+   "s": [
+    200,
+    4,
+    112
+   ],
+   "col": "#AEB6BC"
+  },
+  {
+   "t": "box",
+   "nom": "Panneau avant (marqueur AV)",
+   "c": [
+    0,
+    -28,
+    -1
+   ],
+   "s": [
+    190,
+    76,
+    2
+   ],
+   "col": "#9AA3A9"
+  },
+  {
+   "t": "box",
+   "nom": "Panneau arrière (marqueur AR)",
+   "c": [
+    0,
+    -28,
+    -111
+   ],
+   "s": [
+    190,
+    76,
+    2
+   ],
+   "col": "#9AA3A9"
+  },
+  {
+   "t": "box",
+   "nom": "Convoyeur à palettes",
+   "c": [
+    0,
+    21,
+    -28
+   ],
+   "s": [
+    275,
+    8,
+    16
+   ],
+   "col": "#8F9AA1"
+  },
+  {
+   "t": "box",
+   "nom": "Chaîne du convoyeur",
+   "c": [
+    0,
+    25.5,
+    -28
+   ],
+   "s": [
+    275,
+    1,
+    10
+   ],
+   "col": "#5C666D"
+  },
+  {
+   "t": "box",
+   "nom": "Palette porte-récipient",
+   "c": [
+    -110,
+    28,
+    -28
+   ],
+   "s": [
+    12,
+    4,
+    12
+   ],
+   "col": "#D9B26A"
+  },
+  {
+   "t": "box",
+   "nom": "Palette porte-récipient",
+   "c": [
+    -80,
+    28,
+    -28
+   ],
+   "s": [
+    12,
+    4,
+    12
+   ],
+   "col": "#D9B26A"
+  },
+  {
+   "t": "box",
+   "nom": "Palette porte-récipient",
+   "c": [
+    -45,
+    28,
+    -28
+   ],
+   "s": [
+    12,
+    4,
+    12
+   ],
+   "col": "#D9B26A"
+  },
+  {
+   "t": "box",
+   "nom": "Palette porte-récipient",
+   "c": [
+    -15,
+    28,
+    -28
+   ],
+   "s": [
+    12,
+    4,
+    12
+   ],
+   "col": "#D9B26A"
+  },
+  {
+   "t": "box",
+   "nom": "Palette porte-récipient",
+   "c": [
+    15,
+    28,
+    -28
+   ],
+   "s": [
+    12,
+    4,
+    12
+   ],
+   "col": "#D9B26A"
+  },
+  {
+   "t": "box",
+   "nom": "Palette porte-récipient",
+   "c": [
+    45,
+    28,
+    -28
+   ],
+   "s": [
+    12,
+    4,
+    12
+   ],
+   "col": "#D9B26A"
+  },
+  {
+   "t": "box",
+   "nom": "Palette porte-récipient",
+   "c": [
+    100,
+    28,
+    -28
+   ],
+   "s": [
+    12,
+    4,
+    12
+   ],
+   "col": "#D9B26A"
+  },
+  {
+   "t": "cyl",
+   "nom": "Moto-réducteur convoyeur",
+   "c": [
+    140,
+    14,
+    -20
+   ],
+   "r": 5,
+   "h": 16,
+   "col": "#6B7378",
+   "axe": "z"
+  },
+  {
+   "t": "box",
+   "nom": "Armoire électrique",
+   "c": [
+    -62,
+    80,
+    -95
+   ],
+   "s": [
+    66,
+    130,
+    32
+   ],
+   "col": "#B8BEC2"
+  },
+  {
+   "t": "box",
+   "nom": "Porte d'armoire",
+   "c": [
+    -62,
+    80,
+    -78.6
+   ],
+   "s": [
+    60,
+    120,
+    0.8
+   ],
+   "col": "#C4CACE"
+  },
+  {
+   "t": "cyl",
+   "nom": "Balise lumineuse",
+   "c": [
+    -62,
+    152,
+    -95
+   ],
+   "r": 3,
+   "h": 14,
+   "col": "#D9D9D9",
+   "axe": "y"
+  },
+  {
+   "t": "cyl",
+   "nom": "Feu rouge de balise",
+   "c": [
+    -62,
+    161,
+    -95
+   ],
+   "r": 3.2,
+   "h": 4,
+   "col": "#D33A2C",
+   "axe": "y"
+  },
+  {
+   "t": "box",
+   "nom": "Bras du pupitre",
+   "c": [
+    -112,
+    95,
+    -60
+   ],
+   "s": [
+    34,
+    5,
+    5
+   ],
+   "col": "#AEB6BC"
+  },
+  {
+   "t": "box",
+   "nom": "Pupitre opérateur",
+   "c": [
+    -125,
+    80,
+    -45
+   ],
+   "s": [
+    30,
+    24,
+    14
+   ],
+   "col": "#E3E6E8"
+  },
+  {
+   "t": "box",
+   "nom": "Écran tactile",
+   "c": [
+    -122,
+    83,
+    -37.7
+   ],
+   "s": [
+    18,
+    12,
+    0.6
+   ],
+   "col": "#1F2A33"
+  },
+  {
+   "t": "cyl",
+   "nom": "Arrêt d'urgence",
+   "c": [
+    -135,
+    70,
+    -37.2
+   ],
+   "r": 2.6,
+   "h": 3,
+   "col": "#D33A2C",
+   "axe": "z"
+  },
+  {
+   "t": "box",
+   "nom": "Étagère basse",
+   "c": [
+    -75,
+    -22,
+    -30
+   ],
+   "s": [
+    50,
+    3,
+    50
+   ],
+   "col": "#AEB6BC"
+  },
+  {
+   "t": "box",
+   "nom": "Cuve produit liquide",
+   "c": [
+    -62,
+    -6,
+    -22
+   ],
+   "s": [
+    34,
+    28,
+    26
+   ],
+   "col": "#C7CDD1"
+  },
+  {
+   "t": "box",
+   "nom": "Pompe doseuse",
+   "c": [
+    -100,
+    -22,
+    -20
+   ],
+   "s": [
+    14,
+    22,
+    12
+   ],
+   "col": "#E07A1F"
+  },
+  {
+   "t": "cyl",
+   "nom": "Moteur de pompe",
+   "c": [
+    -100,
+    -4,
+    -20
+   ],
+   "r": 5,
+   "h": 12,
+   "col": "#6B7378",
+   "axe": "y"
+  },
+  {
+   "t": "box",
+   "nom": "Carter de protection",
+   "c": [
+    45,
+    70,
+    -56
+   ],
+   "s": [
+    110,
+    110,
+    112
+   ],
+   "col": "#DDE7EE",
+   "op": 0.14,
+   "aretes": "#E6C21A"
+  },
+  {
+   "t": "cyl",
+   "nom": "Trémie produit solide",
+   "c": [
+    30,
+    100,
+    -55
+   ],
+   "r": 18,
+   "h": 30,
+   "col": "#D8DCDF",
+   "axe": "y"
+  },
+  {
+   "t": "cone",
+   "nom": "Fond conique de trémie",
+   "c": [
+    30,
+    77,
+    -55
+   ],
+   "r1": 18,
+   "r2": 5,
+   "h": 16,
+   "col": "#D8DCDF"
+  },
+  {
+   "t": "cyl",
+   "nom": "Moto-réducteur M3",
+   "c": [
+    14,
+    62,
+    -55
+   ],
+   "r": 4,
+   "h": 14,
+   "col": "#6B7378",
+   "axe": "x"
+  },
+  {
+   "t": "cyl",
+   "nom": "Vis d'Archimède",
+   "c": [
+    30,
+    58,
+    -55
+   ],
+   "r": 3,
+   "h": 20,
+   "col": "#AEB6BC",
+   "axe": "y"
+  },
+  {
+   "t": "cyl",
+   "nom": "Tête de dosage",
+   "c": [
+    30,
+    38,
+    -30
+   ],
+   "r": 3,
+   "h": 14,
+   "col": "#C9CFD3",
+   "axe": "y"
+  },
+  {
+   "t": "box",
+   "nom": "Vérin entrée sas",
+   "c": [
+    -5,
+    32,
+    -12
+   ],
+   "s": [
+    4,
+    4,
+    12
+   ],
+   "col": "#2F6FD0"
+  },
+  {
+   "t": "box",
+   "nom": "Vérin arrêt dosage",
+   "c": [
+    15,
+    32,
+    -12
+   ],
+   "s": [
+    4,
+    4,
+    12
+   ],
+   "col": "#2F6FD0"
+  },
+  {
+   "t": "box",
+   "nom": "Îlot de distributeurs",
+   "c": [
+    45,
+    65,
+    -6
+   ],
+   "s": [
+    16,
+    10,
+    6
+   ],
+   "col": "#2F6FD0"
+  },
+  {
+   "t": "cyl",
+   "nom": "Support de table",
+   "c": [
+    75,
+    24,
+    -55
+   ],
+   "r": 4,
+   "h": 16,
+   "col": "#6B7378",
+   "axe": "y"
+  },
+  {
+   "t": "cyl",
+   "nom": "Table de distribution des bouchons",
+   "c": [
+    75,
+    33,
+    -55
+   ],
+   "r": 30,
+   "h": 3,
+   "col": "#C9CFD3",
+   "axe": "y"
+  },
+  {
+   "t": "cyl",
+   "nom": "Colonne pick & place",
+   "c": [
+    62,
+    55,
+    -35
+   ],
+   "r": 3,
+   "h": 40,
+   "col": "#AEB6BC",
+   "axe": "y"
+  },
+  {
+   "t": "box",
+   "nom": "Bras pick & place",
+   "c": [
+    72,
+    74,
+    -35
+   ],
+   "s": [
+    26,
+    4,
+    4
+   ],
+   "col": "#AEB6BC"
+  },
+  {
+   "t": "cyl",
+   "nom": "Ventouse",
+   "c": [
+    82,
+    66,
+    -35
+   ],
+   "r": 2,
+   "h": 10,
+   "col": "#3A3F44",
+   "axe": "y"
+  },
+  {
+   "t": "cyl",
+   "nom": "Moteur de vissage",
+   "c": [
+    62,
+    48,
+    -28
+   ],
+   "r": 3,
+   "h": 10,
+   "col": "#6B7378",
+   "axe": "y"
+  },
+  {
+   "t": "box",
+   "nom": "Unité de traitement de l'air",
+   "c": [
+    90,
+    -12,
+    -6
+   ],
+   "s": [
+    12,
+    20,
+    8
+   ],
+   "col": "#8FA3B0"
+  },
+  {
+   "t": "cyl",
+   "nom": "Bol de filtre",
+   "c": [
+    90,
+    -26,
+    -6
+   ],
+   "r": 3,
+   "h": 8,
+   "col": "#BFD3DE",
+   "axe": "y"
+  }
+ ]
+}
