@@ -26,14 +26,14 @@ jobs:
         run: |
           SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
           yes | "$SDKM" --licenses > /dev/null || true
-          "$SDKM" --install "platforms;android-37" "build-tools;35.0.0" > /dev/null || true
-          ls "$ANDROID_HOME/platforms"
+          "$SDKM" --install "platforms;android-35" "build-tools;35.0.0" > /dev/null || true
 
       - name: Compiler
         run: |
           set -o pipefail
           chmod +x gradlew
-          ./gradlew --no-daemon --stacktrace assembleDebug 2>&1 | tee build.log
+          echo "Plateformes installées : $(ls $ANDROID_HOME/platforms | tr '\n' ' ')" > build.log
+          ./gradlew --no-daemon --stacktrace assembleDebug 2>&1 | tee -a build.log
 
       - name: Remonter les erreurs
         if: failure()

@@ -3,12 +3,12 @@ apply plugin: 'kotlin-android'
 
 android {
     namespace "fr.atelier.ra"
-    compileSdkVersion 37
+    compileSdkVersion 35
 
     defaultConfig {
         applicationId "fr.atelier.ra"
         minSdkVersion 24
-        targetSdkVersion 37
+        targetSdkVersion 35
         versionCode 1
         versionName '0.1'
     }
