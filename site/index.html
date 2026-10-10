@@ -48,7 +48,7 @@
         <p class="sub" style="margin-top:12px">Scannez le QR code avec l'appareil photo du téléphone Android, ou ouvrez cette page directement sur le téléphone. Une nouvelle version s'installe <b>par-dessus</b> l'ancienne, sans perdre les réglages.</p>
         <div class="row" style="margin-top:8px">
           <a class="btn" id="dl-apk" href="https://github.com/Ghepito/atelier-ra/releases/tag/derniere-version">⬇ AtelierRA.apk</a>
-          <a class="btn ghost" id="dl-pdf" href="https://github.com/Ghepito/atelier-ra/releases/tag/derniere-version">🖨 Marqueurs à imprimer (PDF)</a>
+          <a class="btn ghost" id="dl-pdf" href="marqueurs-appli.pdf" target="_blank" rel="noopener">🖨 Marqueurs à imprimer (PDF)</a>
         </div>
       </div>
     </div>
@@ -103,7 +103,6 @@ derniereVersion().then(v => {
   document.getElementById("v-meta").innerHTML = `<span class="version">● disponible</span> · publiée le ${fmtDate(v.date)}${mo ? " · " + mo : ""}`;
   document.getElementById("btn-v").textContent = v.version ? "v" + v.version : "";
   if (v.apk) { document.getElementById("dl-apk").href = v.apk; document.getElementById("btn-apk").href = v.apk; qr(v.apk); }
-  if (v.pdf) document.getElementById("dl-pdf").href = v.pdf;
 }).catch(() => {
   document.getElementById("v-meta").textContent = "Version non lue (GitHub momentanément indisponible) — les boutons mènent à la page de téléchargement.";
 });

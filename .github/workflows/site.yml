@@ -3,7 +3,7 @@ name: Publier le portail
 on:
   push:
     branches: [ main ]
-    paths: [ 'site/**', '.github/workflows/site.yml' ]
+    paths: [ 'site/**', 'marqueurs/**', '.github/workflows/site.yml' ]
   workflow_dispatch:
 
 permissions:
@@ -23,6 +23,8 @@ jobs:
       url: ${{ steps.deploiement.outputs.page_url }}
     steps:
       - uses: actions/checkout@v5
+      - name: Joindre la planche de marqueurs
+        run: cp marqueurs/marqueurs-appli.pdf site/marqueurs-appli.pdf
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4
         with:
