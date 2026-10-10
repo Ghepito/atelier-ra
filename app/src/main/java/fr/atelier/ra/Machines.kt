@@ -21,6 +21,12 @@ data class Bloc(val titre: String, val texte: String)
 /** Étape de procédure ; `repere` = index (0, 1, …) du point d'entretien à montrer, ou null. */
 data class Etape(val texte: String, val repere: Int?)
 
+/**
+ * Maillon de la chaîne d'énergie posé sur la machine.
+ * `bloc` = index (0, 1, …) du bloc fonctionnel ; position donnée par un repère (`repere`) ou en cm.
+ */
+data class Maillon(val bloc: Int, val nom: String, val repere: Int?, val xCm: Float, val yCm: Float, val zCm: Float)
+
 data class Machine(
     val key: String,
     val code: String,
@@ -32,6 +38,7 @@ data class Machine(
     val securiteTitre: String,
     val etapes: List<Etape>,
     val note: String,
+    val chaine: List<Maillon> = emptyList(),
 )
 
 object Machines {
@@ -62,6 +69,20 @@ object Machines {
                     else Etape(e.toString(), null)
                 }
             }
+            val chaine = o.optJSONArray("chaine")?.let { a ->
+                (0 until a.length()).map {
+                    val c = a.getJSONObject(it)
+                    val pos = c.optJSONObject("pos_cm")
+                    Maillon(
+                        bloc = c.getInt("bloc") - 1,
+                        nom = c.getString("nom"),
+                        repere = if (c.has("repere")) c.getInt("repere") - 1 else null,
+                        xCm = pos?.optDouble("x", 0.0)?.toFloat() ?: 0f,
+                        yCm = pos?.optDouble("y", 0.0)?.toFloat() ?: 0f,
+                        zCm = pos?.optDouble("z", 0.0)?.toFloat() ?: 0f,
+                    )
+                }
+            } ?: emptyList()
             Machine(
                 key = o.getString("id"),
                 code = o.getString("code"),
@@ -73,6 +94,7 @@ object Machines {
                 securiteTitre = s.getString("titre"),
                 etapes = etapes,
                 note = s.getString("note"),
+                chaine = chaine,
             )
         }
     }

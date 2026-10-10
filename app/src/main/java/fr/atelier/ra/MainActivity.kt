@@ -10,6 +10,8 @@ import android.graphics.drawable.GradientDrawable
 import android.net.Uri
 import android.opengl.GLSurfaceView
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.util.TypedValue
 import android.view.Gravity
@@ -40,6 +42,7 @@ import fr.atelier.ra.common.DisplayRotationHelper
 import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.Locale
 import kotlin.concurrent.thread
 
 class MainActivity : AppCompatActivity(), ArEvents {
@@ -66,6 +69,7 @@ class MainActivity : AppCompatActivity(), ArEvents {
 
     private lateinit var top: LinearLayout
     private lateinit var status: TextView
+    private lateinit var prox: TextView
     private lateinit var hint: TextView
     private lateinit var banner: TextView
     private lateinit var arrows: ArrowView
@@ -91,6 +95,22 @@ class MainActivity : AppCompatActivity(), ArEvents {
 
     private val prefs by lazy { getSharedPreferences("atelier-ra", Context.MODE_PRIVATE) }
     private val tailles = listOf(5, 8, 12, 18)
+    private val rayons = listOf(0.5f, 1f, 2f, 3f, 5f, 10f)
+    private val rayon get() = prefs.getFloat("rayon_m", 2f)
+
+    private val horloge = Handler(Looper.getMainLooper())
+    private var dernierBloc = -2
+    private val tic = object : Runnable {
+        override fun run() {
+            val n = renderer.proches.count { it.distance <= rayon }
+            prox.text = "⌖ $n"
+            if (!masque && tab == 0 && renderer.animation != null && renderer.blocActif != dernierBloc) {
+                dernierBloc = renderer.blocActif
+                afficher()
+            }
+            horloge.postDelayed(this, 500)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -193,6 +213,12 @@ class MainActivity : AppCompatActivity(), ArEvents {
             setPadding(dpi(10), dpi(4), dpi(10), dpi(4))
             background = rounded(Color.argb(40, 255, 255, 255), 99f)
         }
+        prox = text("⌖ 0", 13f, TXT, true).apply {
+            setPadding(dpi(10), dpi(4), dpi(10), dpi(4))
+            background = rounded(Color.argb(40, 255, 255, 255), 99f)
+            setOnClickListener { listeProximite() }
+        }
+        top.addView(prox, LinearLayout.LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply { rightMargin = dpi(6) })
         top.addView(status)
         val gear = text("⚙", 18f).apply {
             gravity = Gravity.CENTER
@@ -387,16 +413,34 @@ class MainActivity : AppCompatActivity(), ArEvents {
         }
     }
 
+    private val couleursBlocs = intArrayOf(
+        Color.rgb(255, 107, 74), Color.rgb(255, 176, 32), Color.rgb(245, 230, 99), Color.rgb(60, 207, 142), Color.rgb(74, 168, 255))
+
     private fun ongletFonction(m: Machine) {
+        val anime = renderer.animation == m.key
+        if (m.chaine.isNotEmpty()) {
+            content.addView(bouton(if (anime) "■  Arrêter l'animation" else "▶  Voir la chaîne sur la machine",
+                if (anime) Color.argb(30, 255, 255, 255) else ACC, if (anime) TXT else DARK) {
+                renderer.animation = if (anime) null else m.key
+                dernierBloc = -2
+                afficher()
+            }, lp(bottom = 8))
+            if (anime) content.addView(text("Le flux circule de maillon en maillon sur la machine ; le bloc parcouru s'allume ci-dessous.", 12.5f, MUT), lp(bottom = 6))
+        }
         content.addView(text(m.fonctionIntro, 14f, MUT).apply { setPadding(0, 0, 0, dpi(8)) })
+        val actif = if (anime) renderer.blocActif else -1
         m.blocs.forEachIndexed { i, b ->
             if (i > 0) content.addView(text("▼", 11f, MUT).apply { gravity = Gravity.CENTER })
+            val coul = couleursBlocs[i % couleursBlocs.size]
+            val on = i == actif
             val card = LinearLayout(this).apply {
                 orientation = LinearLayout.VERTICAL
                 setPadding(dpi(12), dpi(8), dpi(10), dpi(8))
-                background = rounded(Color.argb(20, 255, 176, 32), 8f, LINE)
+                background = if (on) rounded(Color.argb(60, Color.red(coul), Color.green(coul), Color.blue(coul)), 8f, coul)
+                             else rounded(Color.argb(20, 255, 176, 32), 8f, LINE)
             }
-            card.addView(text(b.titre.uppercase(), 12f, ACC, true))
+            val organes = m.chaine.filter { it.bloc == i }.joinToString(", ") { it.nom }
+            card.addView(text(b.titre.uppercase() + if (organes.isNotEmpty() && anime) "  ·  $organes" else "", 12f, if (anime) coul else ACC, true))
             card.addView(text(b.texte, 14f))
             content.addView(card, lp(top = 2, bottom = 2))
         }
@@ -576,6 +620,7 @@ class MainActivity : AppCompatActivity(), ArEvents {
         val taille = prefs.getInt("taille_cm", 8)
         val items = arrayOf(
             "Taille des marqueurs imprimés : $taille cm",
+            "Rayon de la liste « À proximité » : ${fmtM(rayon)}",
             if (modePlacement) "Mode placement des repères : ACTIVÉ" else "Mode placement des repères : désactivé",
             "Exporter les positions (fichier machines.json)",
             "Effacer les positions placées",
@@ -586,27 +631,71 @@ class MainActivity : AppCompatActivity(), ArEvents {
             .setItems(items) { _, which ->
                 when (which) {
                     0 -> choisirTaille()
-                    1 -> {
+                    1 -> choisirRayon()
+                    2 -> {
                         modePlacement = !modePlacement
                         if (!modePlacement) renderer.placement = null
                         tab = 1; replie = false
                         montrerPanneau(); majAide()
                         if (modePlacement) Toast.makeText(this, "Onglet Entretien : touchez 📍 à côté d'un point, puis l'endroit réel.", Toast.LENGTH_LONG).show()
                     }
-                    2 -> startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
+                    3 -> startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
                         type = "text/plain"
                         putExtra(Intent.EXTRA_SUBJECT, "machines.json — Atelier RA")
                         putExtra(Intent.EXTRA_TEXT, store.exporterJson(this@MainActivity))
                     }, "Exporter les positions"))
-                    3 -> AlertDialog.Builder(this)
+                    4 -> AlertDialog.Builder(this)
                         .setMessage("Revenir aux positions du fichier pour tous les repères ?")
                         .setPositiveButton("Effacer") { _, _ -> store.effacerPositions(); afficher() }
                         .setNegativeButton("Annuler", null).show()
-                    4 -> recreate()
+                    5 -> recreate()
                 }
             }
             .setNegativeButton("Fermer", null)
             .show()
+    }
+
+    private fun fmtM(d: Float) = if (d < 1f) "${(d * 100).toInt()} cm" else String.format(Locale.FRANCE, "%.1f m", d).replace(",0 m", " m")
+
+    private fun choisirRayon() {
+        AlertDialog.Builder(this)
+            .setTitle("Rayon de la liste « À proximité »")
+            .setSingleChoiceItems(rayons.map { fmtM(it) }.toTypedArray(), rayons.indexOf(rayon).coerceAtLeast(0)) { d, which ->
+                prefs.edit().putFloat("rayon_m", rayons[which]).apply()
+                d.dismiss()
+            }
+            .setNegativeButton("Annuler", null)
+            .show()
+    }
+
+    /** Liste de tous les repères localisés à moins de `rayon`, du plus proche au plus lointain. */
+    private fun listeProximite() {
+        val r = rayon
+        val liste = renderer.proches.filter { it.distance <= r }.sortedBy { it.distance }
+        val connues = renderer.proches.map { it.machine }.distinct().size
+        val titre = "À moins de ${fmtM(r)} : ${liste.size} point" + if (liste.size > 1) "s" else ""
+        val b = AlertDialog.Builder(this).setTitle(titre)
+        if (liste.isEmpty()) {
+            b.setMessage(if (connues == 0) "Aucun équipement localisé pour l'instant : visez un marqueur."
+                         else "Aucun point dans ce rayon. Rapprochez-vous ou augmentez le rayon dans ⚙.")
+        } else {
+            val items = liste.map { p ->
+                val m = machines[p.machine]!!
+                val pt = m.entretien[p.index]
+                val etat = if (store.estFait(m.key, p.index)) "  ✓ fait" else ""
+                "${p.index + 1} · ${pt.ou}\n${m.code} · ${fmtM(p.distance)} · ⟳ ${pt.periode}$etat"
+            }.toTypedArray()
+            b.setItems(items) { _, which ->
+                val p = liste[which]
+                if (p.machine != current) choisirMachine(p.machine)
+                renderer.selection = Pair(p.machine, p.index)
+                tab = 1; replie = false
+                montrerPanneau()
+            }
+        }
+        b.setNegativeButton("Fermer", null)
+        if (connues > 0) b.setNeutralButton("Rayon…") { _, _ -> choisirRayon() }
+        b.show()
     }
 
     private fun choisirTaille() {
@@ -692,6 +781,8 @@ class MainActivity : AppCompatActivity(), ArEvents {
         }
         surface.onResume()
         rotationHelper.onResume()
+        horloge.removeCallbacks(tic)
+        horloge.post(tic)
     }
 
     private fun configurer(s: Session) {
@@ -717,6 +808,7 @@ class MainActivity : AppCompatActivity(), ArEvents {
 
     override fun onPause() {
         super.onPause()
+        horloge.removeCallbacks(tic)
         if (session != null) {
             rotationHelper.onPause()
             surface.onPause()

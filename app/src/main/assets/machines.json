@@ -1,5 +1,5 @@
 {
-  "_aide": "Positions pos_cm mesurées depuis le CENTRE du marqueur posé à plat : x vers la droite (+), y au-dessus de la surface (+), z vers le bas du marqueur, côté opposé au bandeau HAUT (+). Étapes de sécurité : texte simple, ou objet {texte, repere} où repere est le numéro du point d'entretien à montrer.",
+  "_aide": "Positions pos_cm mesurées depuis le CENTRE du marqueur posé à plat : x vers la droite (+), y au-dessus de la surface (+), z vers le bas du marqueur, côté opposé au bandeau HAUT (+). Étapes de sécurité : texte simple, ou objet {texte, repere} où repere est le numéro du point d'entretien à montrer. Chaîne d'énergie : liste de maillons {bloc (numéro du bloc fonctionnel), nom, repere (numéro de point) ou pos_cm}.",
   "machines": [
     {
       "id": "table",
@@ -64,7 +64,41 @@
           "Ne pas déplacer la table chargée."
         ],
         "note": "Contenu d'exemple — à remplacer par les données réelles de l'équipement."
-      }
+      },
+      "chaine": [
+        {
+          "bloc": 1,
+          "nom": "Plateau",
+          "repere": 3
+        },
+        {
+          "bloc": 2,
+          "nom": "Ceinture",
+          "pos_cm": {
+            "x": -45,
+            "y": -6,
+            "z": 0
+          }
+        },
+        {
+          "bloc": 2,
+          "nom": "Pied",
+          "pos_cm": {
+            "x": -50,
+            "y": -40,
+            "z": 5
+          }
+        },
+        {
+          "bloc": 3,
+          "nom": "Patin",
+          "pos_cm": {
+            "x": -50,
+            "y": -73,
+            "z": 5
+          }
+        }
+      ]
     },
     {
       "id": "bureau",
@@ -143,7 +177,37 @@
           }
         ],
         "note": "Exemple pédagogique : l'affichage en réalité augmentée ne remplace ni la procédure officielle de consignation, ni l'habilitation."
-      }
+      },
+      "chaine": [
+        {
+          "bloc": 1,
+          "nom": "Prise murale",
+          "pos_cm": {
+            "x": -60,
+            "y": -75,
+            "z": -35
+          }
+        },
+        {
+          "bloc": 2,
+          "nom": "Multiprise",
+          "repere": 1
+        },
+        {
+          "bloc": 3,
+          "nom": "Alimentation PC",
+          "repere": 3
+        },
+        {
+          "bloc": 4,
+          "nom": "Écran",
+          "pos_cm": {
+            "x": 10,
+            "y": 30,
+            "z": -25
+          }
+        }
+      ]
     }
   ]
 }

@@ -200,3 +200,35 @@ object LabelTextures {
 
     fun clear() = cache.clear()
 }
+
+/** Étiquettes de texte (pilule colorée) ; renvoie l'identifiant de texture et le rapport largeur/hauteur. */
+object TextTextures {
+    private val cache = HashMap<String, Pair<Int, Float>>()
+
+    fun get(texte: String, fond: Int, encre: Int): Pair<Int, Float> = cache.getOrPut("$texte|$fond|$encre") {
+        val h = 64
+        val p = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            textSize = 36f; typeface = Typeface.DEFAULT_BOLD; textAlign = Paint.Align.CENTER
+        }
+        val w = (p.measureText(texte) + 40f).toInt().coerceAtLeast(h)
+        val bmp = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
+        val c = Canvas(bmp)
+        val bg = Paint(Paint.ANTI_ALIAS_FLAG).apply { color = fond }
+        c.drawRoundRect(2f, 2f, w - 2f, h - 2f, 30f, 30f, bg)
+        p.color = encre
+        val fm = p.fontMetrics
+        c.drawText(texte, w / 2f, h / 2f - (fm.ascent + fm.descent) / 2, p)
+        val t = IntArray(1)
+        GLES20.glGenTextures(1, t, 0)
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, t[0])
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_LINEAR)
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR)
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE)
+        GLES20.glTexParameteri(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE)
+        GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bmp, 0)
+        bmp.recycle()
+        Pair(t[0], w.toFloat() / h)
+    }
+
+    fun clear() = cache.clear()
+}

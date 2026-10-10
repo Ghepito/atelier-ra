@@ -28,6 +28,9 @@ import kotlin.math.sqrt
 
 enum class Etat { INIT, RECHERCHE, MARQUEUR, ESPACE }
 
+/** Un repère localisé dans l'espace, avec sa distance au téléphone (m). */
+data class Proche(val machine: String, val index: Int, val distance: Float)
+
 /** Événements envoyés à l'interface (appelés depuis le fil de rendu). */
 interface ArEvents {
     fun etat(etat: Etat, machine: String?, message: String?)
@@ -63,6 +66,14 @@ class ArRenderer(
      */
     @Volatile var cible = FloatArray(5)
 
+    /** Machine dont la chaîne d'énergie est animée (null = aucune) */
+    @Volatile var animation: String? = null
+    /** Bloc fonctionnel actuellement parcouru par l'animation (-1 = aucun) */
+    @Volatile var blocActif = -1
+    /** Tous les repères localisés à cette image, avec leur distance */
+    @Volatile var proches: List<Proche> = emptyList()
+    private val prochesTmp = ArrayList<Proche>()
+
     private val touches = ConcurrentLinkedQueue<FloatArray>()
     fun toucher(x: Float, y: Float) { touches.add(floatArrayOf(x, y)) }
 
@@ -72,6 +83,7 @@ class ArRenderer(
     private lateinit var cone: Mesh
     private lateinit var stem: Mesh
     private lateinit var frameMesh: Mesh
+    private lateinit var cube: Mesh
     private var textureSet = false
     private var width = 1
     private var height = 1
@@ -132,7 +144,9 @@ class ArRenderer(
             cone = Mesh.cone(CONE_R, CONE_H)
             stem = Mesh.box(0.003f, STEM_H, 0.003f, 0f, CONE_H + STEM_H / 2, 0f)
             frameMesh = Mesh.frame(0.06f)
+            cube = Mesh.box(1f, 1f, 1f)
             LabelTextures.clear()
+            TextTextures.clear()
             textureSet = false
         } catch (e: Exception) {
             Log.e(TAG, "Initialisation OpenGL", e)
@@ -181,7 +195,9 @@ class ArRenderer(
             var current: Suivi? = null
             val t = SystemClock.uptimeMillis()
             ecran.clear()
+            prochesTmp.clear()
             var nouvelleCible = FloatArray(5)
+            var actif = -1
 
             for (sv in suivis.values) {
                 val img = sv.image
@@ -199,8 +215,11 @@ class ArRenderer(
                 if (current == null || sv.lastFull > current.lastFull) current = sv
                 val c = dessinerMachine(sv, pose, full, camPose, t)
                 if (c != null) nouvelleCible = c
+                if (animation == sv.key) actif = dessinerChaine(sv, pose, camPose, t)
             }
             cible = nouvelleCible
+            blocActif = actif
+            proches = ArrayList(prochesTmp)
 
             GLES20.glDisable(GLES20.GL_BLEND)
             GLES20.glDisable(GLES20.GL_DEPTH_TEST)
@@ -267,6 +286,10 @@ class ArRenderer(
                 else -> ACC
             }
 
+            vIn[0] = x; vIn[1] = y; vIn[2] = z; vIn[3] = 1f
+            Matrix.multiplyMV(vOut, 0, base, 0, vIn, 0)
+            prochesTmp.add(Proche(sv.key, i, dist3(vOut, camPose)))
+
             Matrix.translateM(model, 0, base, 0, x, y, z)
             Matrix.multiplyMM(mvp, 0, vp, 0, model, 0)
             flat.draw(cone, mvp, color)
@@ -301,6 +324,92 @@ class ArRenderer(
             }
         }
         return res
+    }
+
+    private fun dist3(v: FloatArray, p: Pose): Float {
+        val dx = v[0] - p.tx(); val dy = v[1] - p.ty(); val dz = v[2] - p.tz()
+        return sqrt(dx * dx + dy * dy + dz * dz)
+    }
+
+    private val COULEURS_BLOCS = arrayOf(
+        floatArrayOf(1f, 0.42f, 0.29f, 1f),   // rouge
+        floatArrayOf(1f, 0.69f, 0.125f, 1f),  // ambre
+        floatArrayOf(0.96f, 0.9f, 0.39f, 1f), // jaune
+        floatArrayOf(0.235f, 0.81f, 0.557f, 1f), // vert
+        floatArrayOf(0.29f, 0.66f, 1f, 1f),   // bleu
+    )
+    private val COULEURS_ETIQ = intArrayOf(
+        android.graphics.Color.rgb(255, 107, 74), android.graphics.Color.rgb(255, 176, 32),
+        android.graphics.Color.rgb(245, 230, 99), android.graphics.Color.rgb(60, 207, 142),
+        android.graphics.Color.rgb(74, 168, 255))
+
+    private fun cubeEn(lx: Float, ly: Float, lz: Float, taille: Float, couleur: FloatArray) {
+        Matrix.translateM(model, 0, base, 0, lx, ly, lz)
+        Matrix.scaleM(model, 0, taille, taille, taille)
+        Matrix.multiplyMM(mvp, 0, vp, 0, model, 0)
+        flat.draw(cube, mvp, couleur)
+    }
+
+    /**
+     * Chaîne d'énergie animée : maillons colorés par bloc fonctionnel, flux de particules
+     * de maillon en maillon, étiquette « BLOC · organe ». Renvoie le bloc actif.
+     */
+    private fun dessinerChaine(sv: Suivi, pose: Pose, camPose: Pose, t: Long): Int {
+        val machine = machines[sv.key] ?: return -1
+        val ch = machine.chaine
+        if (ch.isEmpty()) return -1
+        pose.toMatrix(base, 0)
+        val pts = ch.map { c ->
+            val r = c.repere
+            val p = if (r != null && r in machine.entretien.indices) store.position(machine, r) else floatArrayOf(c.xCm, c.yCm, c.zCm)
+            floatArrayOf(p[0] / 100f, p[1] / 100f, p[2] / 100f)
+        }
+        val actifIdx = ((t / 1400L) % ch.size).toInt()
+
+        // Flux entre maillons
+        for (k in 0 until pts.size - 1) {
+            val a = pts[k]; val b = pts[k + 1]
+            val dx = b[0] - a[0]; val dy = b[1] - a[1]; val dz = b[2] - a[2]
+            val len = sqrt(dx * dx + dy * dy + dz * dz)
+            val col = COULEURS_BLOCS[ch[k].bloc.coerceAtLeast(0) % COULEURS_BLOCS.size]
+            val sombre = floatArrayOf(col[0] * 0.45f, col[1] * 0.45f, col[2] * 0.45f, 1f)
+            val n = (len / 0.035f).toInt().coerceAtLeast(2)
+            for (j in 1 until n) {
+                val u = j.toFloat() / n
+                cubeEn(a[0] + dx * u, a[1] + dy * u, a[2] + dz * u, 0.005f, sombre)
+            }
+            val m = (len / 0.12f).toInt().coerceIn(2, 8)
+            for (j in 0 until m) {
+                val u = ((t % 1600L) / 1600f + j.toFloat() / m) % 1f
+                cubeEn(a[0] + dx * u, a[1] + dy * u, a[2] + dz * u, 0.012f, col)
+            }
+        }
+
+        // Maillons et étiquettes
+        camPose.toMatrix(tmp, 0)
+        ch.forEachIndexed { k, c ->
+            val p = pts[k]
+            val col = COULEURS_BLOCS[c.bloc.coerceAtLeast(0) % COULEURS_BLOCS.size]
+            val actif = k == actifIdx
+            val taille = if (actif) 0.026f * (1.15f + 0.15f * sin(t / 120.0).toFloat()) else 0.02f
+            cubeEn(p[0], p[1], p[2], taille, col)
+
+            val titre = machine.blocs.getOrNull(c.bloc)?.titre?.uppercase() ?: ""
+            val texte = if (titre.isNotEmpty()) "$titre · ${c.nom}" else c.nom
+            val (tex, ratio) = if (actif) TextTextures.get(texte, COULEURS_ETIQ[c.bloc.coerceAtLeast(0) % COULEURS_ETIQ.size], android.graphics.Color.rgb(29, 20, 0))
+                               else TextTextures.get(texte, android.graphics.Color.argb(230, 16, 26, 31), android.graphics.Color.WHITE)
+            vIn[0] = p[0]; vIn[1] = p[1] + 0.045f; vIn[2] = p[2]; vIn[3] = 1f
+            Matrix.multiplyMV(vOut, 0, base, 0, vIn, 0)
+            val bb = tmp.copyOf()
+            bb[12] = vOut[0]; bb[13] = vOut[1]; bb[14] = vOut[2]
+            val h = if (actif) 0.032f else 0.024f
+            Matrix.scaleM(model, 0, bb, 0, h * ratio, h, 1f)
+            Matrix.multiplyMM(mvp, 0, vp, 0, model, 0)
+            GLES20.glDisable(GLES20.GL_DEPTH_TEST)
+            sprite.draw(tex, mvp, WHITE)
+            GLES20.glEnable(GLES20.GL_DEPTH_TEST)
+        }
+        return ch[actifIdx].bloc
     }
 
     private fun traiterTouches(frame: Frame) {
