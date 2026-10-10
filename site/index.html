@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atelier RA — Portail</title>
+<meta name="description" content="Portail du projet Atelier RA : télécharger l'appli de maintenance assistée par réalité augmentée, tutos et espace de travail.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 108 108'%3E%3Crect width='108' height='108' rx='22' fill='%230F1418'/%3E%3Cpath fill='%23FFB020' d='M54,24a12,12 0,1 1,-0.01,0zM51,40h6v22h-6zM54,74l-8,-12h16z'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="top"></header>
+
+<main>
+  <section class="hero">
+    <div>
+      <div class="eyebrow">Maintenance assistée par réalité augmentée</div>
+      <h1>Visez la machine,<br><em>elle vous répond.</em></h1>
+      <p class="lead">Un marqueur collé sur l'équipement, un téléphone Android : l'appli affiche la fiche de la machine, ses chaînes d'action et d'acquisition, et des repères 3D posés sur les organes réels.</p>
+      <div class="row">
+        <a class="btn" id="btn-apk" href="https://github.com/Ghepito/atelier-ra/releases/tag/derniere-version">⬇ Télécharger l'appli <small id="btn-v"></small></a>
+        <a class="btn ghost" href="tutos.html#installer">Comment l'installer ?</a>
+      </div>
+    </div>
+    <div class="phone" aria-hidden="true">
+      <div class="screen">
+        <div class="bar">ATELIER RA <span style="margin-left:auto" class="pill ok">Marqueur suivi</span></div>
+        <div class="marker"></div>
+        <div class="pin" data-n="1" style="left:28%;top:47%"></div>
+        <div class="pin" data-n="2" style="left:70%;top:44%"></div>
+        <div class="pin" data-n="3" style="left:52%;top:26%"></div>
+        <div class="sheet">
+          <div style="display:flex;gap:6px;align-items:center"><span class="pill" style="border:1px solid #ffb020;color:#ffb020">POL-01</span><b style="font-size:10px;color:#fff">PolyProd</b></div>
+          <div class="tabs"><span>Fonction</span><span class="on">Entretien</span><span>Sécurité</span><span>Journal</span></div>
+          <div class="ln" style="width:80%"></div><div class="ln" style="width:60%"></div><div class="ln" style="width:72%"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" id="telecharger">
+    <div class="dl">
+      <div id="qr" title="Scanner avec le téléphone pour télécharger l'appli"></div>
+      <div>
+        <div class="eyebrow">Dernière version</div>
+        <h2 style="margin:6px 0 4px" id="v-titre">Atelier RA</h2>
+        <div class="meta" id="v-meta">Lecture de la version en cours…</div>
+        <p class="sub" style="margin-top:12px">Scannez le QR code avec l'appareil photo du téléphone Android, ou ouvrez cette page directement sur le téléphone. Une nouvelle version s'installe <b>par-dessus</b> l'ancienne, sans perdre les réglages.</p>
+        <div class="row" style="margin-top:8px">
+          <a class="btn" id="dl-apk" href="https://github.com/Ghepito/atelier-ra/releases/tag/derniere-version">⬇ AtelierRA.apk</a>
+          <a class="btn ghost" id="dl-pdf" href="https://github.com/Ghepito/atelier-ra/releases/tag/derniere-version">🖨 Marqueurs à imprimer (PDF)</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <h2>Le portail</h2>
+  <p class="sub">Trois espaces, pour trois usages.</p>
+  <div class="grid g3">
+    <a class="card" href="tutos.html" style="text-decoration:none;color:inherit">
+      <div class="ico">📘</div><h3>Tutos</h3>
+      <p>Installer l'appli, imprimer et poser les marqueurs, utiliser les onglets, placer les repères, dépanner.</p>
+    </a>
+    <a class="card" href="espace.html" style="text-decoration:none;color:inherit">
+      <div class="ico">🛠</div><h3>Fiches machines <span class="soon">bientôt</span></h3>
+      <p>Compléter repères, chaînes d'action et d'acquisition, procédures de sécurité — puis publier vers l'appli.</p>
+    </a>
+    <a class="card" href="espace.html" style="text-decoration:none;color:inherit">
+      <div class="ico">📋</div><h3>Collecte terrain <span class="soon">bientôt</span></h3>
+      <p>Fiches de relevé remplies par les apprenants devant la machine : plaques, références, photos, propositions.</p>
+    </a>
+  </div>
+
+  <h2>Équipements</h2>
+  <p class="sub">Machines actuellement décrites dans l'appli.</p>
+  <div class="grid g3">
+    <div class="card"><div class="eyebrow">POL-01</div><h3>PolyProd — ERM</h3><p>2 marqueurs (avant / arrière) · 18 repères · 5 chaînes · consignation électrique + pneumatique.</p></div>
+    <div class="card"><div class="eyebrow">BUR-01</div><h3>Bureau + poste informatique</h3><p>Exemple de démonstration : chaîne d'énergie, mise en sécurité.</p></div>
+    <div class="card"><div class="eyebrow">TAB-01</div><h3>Table de travail</h3><p>Exemple de démonstration : transmission des efforts, règles d'utilisation.</p></div>
+  </div>
+
+  <h2>Dernières évolutions</h2>
+  <p class="sub">Chaque modification recompile l'appli automatiquement.</p>
+  <div class="card"><ul class="log" id="log"><li><time>…</time><span>Chargement…</span></li></ul></div>
+</main>
+
+<footer></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="assets/site.js"></script>
+<script>
+entete("index.html");
+const PAGE = "https://github.com/Ghepito/atelier-ra/releases/tag/derniere-version";
+function qr(url) {
+  const el = document.getElementById("qr"); el.innerHTML = "";
+  try { new QRCode(el, { text: url, width: 156, height: 156, correctLevel: QRCode.CorrectLevel.M }); }
+  catch (e) { el.textContent = "QR indisponible"; }
+}
+qr(PAGE);
+derniereVersion().then(v => {
+  document.getElementById("v-titre").textContent = "Atelier RA — version " + (v.version || "?");
+  const mo = v.apkTaille ? (v.apkTaille / 1048576).toFixed(1).replace(".", ",") + " Mo" : "";
+  document.getElementById("v-meta").innerHTML = `<span class="version">● disponible</span> · publiée le ${fmtDate(v.date)}${mo ? " · " + mo : ""}`;
+  document.getElementById("btn-v").textContent = v.version ? "v" + v.version : "";
+  if (v.apk) { document.getElementById("dl-apk").href = v.apk; document.getElementById("btn-apk").href = v.apk; qr(v.apk); }
+  if (v.pdf) document.getElementById("dl-pdf").href = v.pdf;
+}).catch(() => {
+  document.getElementById("v-meta").textContent = "Version non lue (GitHub momentanément indisponible) — les boutons mènent à la page de téléchargement.";
+});
+historique(8).then(l => {
+  if (!l.length) return;
+  document.getElementById("log").innerHTML = l.map(c => `<li><time>${fmtDate(c.date)}</time><span>${esc(c.msg)}</span></li>`).join("");
+});
+</script>
+</body>
+</html>

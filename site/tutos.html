@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atelier RA — Tutos</title>
+<meta name="description" content="Tutos Atelier RA : installation, marqueurs, utilisation, placement des repères, dépannage, administration.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 108 108'%3E%3Crect width='108' height='108' rx='22' fill='%230F1418'/%3E%3Cpath fill='%23FFB020' d='M54,24a12,12 0,1 1,-0.01,0zM51,40h6v22h-6zM54,74l-8,-12h16z'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="top"></header>
+
+<main>
+<div class="layout">
+<aside class="toc">
+  <div class="grp">Démarrer</div>
+  <a href="#installer">1. Installer l'appli</a>
+  <a href="#marqueurs">2. Imprimer et poser les marqueurs</a>
+  <a href="#lancer">3. Premier lancement</a>
+  <div class="grp">Utiliser</div>
+  <a href="#onglets">4. La fiche et ses onglets</a>
+  <a href="#guidage">5. À proximité et flèche</a>
+  <a href="#placer">6. Placer les repères</a>
+  <a href="#maj">7. Mettre à jour</a>
+  <div class="grp">Aide</div>
+  <a href="#depannage">8. Dépannage</a>
+  <a href="#admin">9. Administration</a>
+</aside>
+
+<div class="tuto">
+
+<section id="installer">
+  <h2>1. Installer l'appli</h2>
+  <p class="sub">5 minutes · un téléphone Android compatible ARCore.</p>
+  <ol class="steps">
+    <li><b>Vérifier le téléphone.</b> La plupart des Android récents de milieu et haut de gamme sont compatibles. Liste officielle : <a href="https://developers.google.com/ar/devices">developers.google.com/ar/devices</a>.</li>
+    <li><b>Télécharger l'APK</b> depuis l'<a href="index.html#telecharger">accueil du portail</a> : scanner le QR code avec l'appareil photo, ou ouvrir la page sur le téléphone et toucher <span class="kbd">⬇ AtelierRA.apk</span>.</li>
+    <li><b>Ouvrir le fichier téléchargé</b> (notification de téléchargement, ou appli « Fichiers » → Téléchargements).</li>
+    <li><b>Autoriser l'installation.</b> Android bloque d'abord : toucher <span class="kbd">Paramètres</span>, activer <i>Autoriser cette source</i> pour le navigateur, puis revenir en arrière.</li>
+    <li><b>Play Protect</b> peut signaler une « appli inconnue » : c'est normal, elle ne vient pas du Play Store. Toucher <span class="kbd">Plus de détails</span> → <span class="kbd">Installer quand même</span>.</li>
+    <li><b>Premier lancement :</b> accepter l'installation de <i>Services Google Play pour la RA</i> si elle est proposée, puis l'accès à la caméra.</li>
+  </ol>
+  <div class="note">L'appli n'est pas publiée sur le Play Store : c'est un prototype de R&D, distribué directement depuis ce portail.</div>
+</section>
+
+<section id="marqueurs">
+  <h2>2. Imprimer et poser les marqueurs</h2>
+  <p class="sub">Le marqueur dit à l'appli « tu es devant telle machine, à tel endroit ».</p>
+  <ol class="steps">
+    <li><b>Imprimer à 100 %</b> (taille réelle) la <a href="index.html#telecharger">planche PDF</a>. Dans la fenêtre d'impression, désactiver « Ajuster à la page ». Vérifier à la règle : 8 cm pour la table et le bureau, 12 cm pour la PolyProd.</li>
+    <li><b>Papier mat</b>, ou plastification mate : les reflets empêchent la détection.</li>
+    <li><b>Coller bien à plat</b>, à l'endroit indiqué sur la planche, bandeau noir « HAUT » dans le bon sens.</li>
+    <li><b>Ne jamais dupliquer</b> un marqueur sur deux machines : chaque image est unique et désigne un seul endroit.</li>
+  </ol>
+  <table>
+    <tr><th>Équipement</th><th>Marqueur(s)</th><th>Pose</th></tr>
+    <tr><td>POL-01 PolyProd</td><td>AV et AR, 12 cm</td><td>Vertical, face avant et face arrière, l'un en face de l'autre, sous le plateau. Taille fixe, rien à régler.</td></tr>
+    <tr><td>BUR-01 / TAB-01</td><td>8 cm (ou 5 cm, expérimental)</td><td>À plat sur le dessus, bandeau HAUT vers le fond. Régler la taille dans ⚙.</td></tr>
+  </table>
+</section>
+
+<section id="lancer">
+  <h2>3. Premier lancement</h2>
+  <ol class="steps">
+    <li><b>Balayer doucement</b> la pièce quelques secondes : le téléphone apprend l'espace autour de lui.</li>
+    <li><b>Approcher le marqueur</b> jusqu'à ce qu'il occupe environ un quart de l'écran (≈ 25 cm pour 8 cm, ≈ 40 cm pour 12 cm).</li>
+    <li>Le <b>cadre</b> apparaît sur le marqueur et la <b>fiche</b> s'ouvre en bas de l'écran. Vous pouvez ensuite reculer et tourner autour de la machine.</li>
+  </ol>
+  <table>
+    <tr><th>Indicateur</th><th>Signification</th></tr>
+    <tr><td><span class="swatch" style="background:var(--ok)"></span><b>Vert</b> — « Marqueur suivi »</td><td>Le marqueur est vu : position la plus précise.</td></tr>
+    <tr><td><span class="swatch" style="background:var(--space)"></span><b>Bleu</b> — « Suivi par l'espace »</td><td>Le marqueur est hors champ : les repères restent accrochés grâce à la cartographie de la pièce.</td></tr>
+    <tr><td><span class="swatch" style="background:#9aa7b0"></span><b>Gris</b> — « Recherche… »</td><td>Aucune machine localisée : viser un marqueur.</td></tr>
+  </table>
+</section>
+
+<section id="onglets">
+  <h2>4. La fiche et ses onglets</h2>
+  <p class="sub">« Masquer ▾ » cache la fiche ; elle revient d'elle-même quand on revise un marqueur, ou via le bouton <span class="kbd">ⓘ POL-01</span>.</p>
+  <div class="grid g2">
+    <div class="card"><h3>⚡ Fonction</h3><p>Les chaînes d'<b>action</b> (énergie) et d'<b>acquisition</b> (information). Choisir une chaîne puis <span class="kbd">▶ Voir la chaîne sur la machine</span> : le flux circule d'organe en organe, le bloc parcouru s'allume.</p></div>
+    <div class="card"><h3>🔧 Entretien</h3><p>Tous les repères de la machine. Toucher une ligne : le repère clignote. Toucher <span class="kbd">☐</span> quand le point est fait (repère vert), puis <span class="kbd">Valider la tournée</span>.</p></div>
+    <div class="card"><h3>⚠ Sécurité</h3><p>Procédure guidée étape par étape (ex. consignation électrique + pneumatique). Chaque <span class="kbd">Fait ✓</span> passe à l'étape suivante et montre l'organe concerné.</p></div>
+    <div class="card"><h3>📒 Journal</h3><p>Historique daté des tournées et procédures enregistrées, partageable par mail ou messagerie.</p></div>
+  </div>
+  <div class="note warn">Les procédures de sécurité affichées sont des aides pédagogiques : elles ne remplacent ni la procédure de consignation de l'établissement, ni l'habilitation requise.</div>
+</section>
+
+<section id="guidage">
+  <h2>5. À proximité et flèche de guidage</h2>
+  <ul>
+    <li><b>Toucher un repère 3D</b> à l'écran ouvre directement sa ligne dans l'onglet Entretien.</li>
+    <li><b><span class="kbd">⌖ 5</span></b> en haut : nombre de points dans le rayon choisi. Le toucher affiche la liste triée du plus proche au plus lointain ; toucher une ligne sélectionne le point.</li>
+    <li>Si le point sélectionné est hors de l'écran, une <b>flèche</b> au bord indique où tourner, avec la distance (« 1,2 m · derrière vous »).</li>
+    <li>Le rayon se règle dans <span class="kbd">⚙</span> → « Rayon de la liste » (50 cm à 10 m).</li>
+  </ul>
+</section>
+
+<section id="placer">
+  <h2>6. Placer les repères sur la machine réelle</h2>
+  <p class="sub">Les positions de départ sont approximatives : on les cale sur place, sans mètre ruban.</p>
+  <ol class="steps">
+    <li><span class="kbd">⚙</span> → <b>Mode placement des repères</b>.</li>
+    <li>Viser le marqueur (cadre vert), puis <b>balayer la zone</b> de l'organe quelques secondes pour que la surface soit reconnue.</li>
+    <li>Dans l'onglet Entretien, toucher <span class="kbd">📍</span> à côté du point voulu : la fiche se masque.</li>
+    <li><b>Toucher l'endroit réel</b> de l'organe à l'écran. Message « Point n placé » : le repère s'y fixe. Les chaînes qui passent par cet organe suivent automatiquement.</li>
+    <li>Une fois la machine calée : <span class="kbd">⚙</span> → <b>Exporter les positions</b>, et envoyer le fichier à l'administrateur pour l'intégrer à tous les téléphones.</li>
+  </ol>
+  <div class="note">Si le message « Surface non reconnue » apparaît : bouger un peu le téléphone autour de l'organe, mieux éclairer, ou toucher une surface plus texturée juste à côté.</div>
+</section>
+
+<section id="maj">
+  <h2>7. Mettre à jour</h2>
+  <p>Quand une nouvelle version existe, un <b>bandeau orange</b> s'affiche en haut de l'appli : le toucher télécharge l'APK, puis l'ouvrir pour l'installer <b>par-dessus</b>. Réglages, tournées et journal sont conservés.</p>
+</section>
+
+<section id="depannage">
+  <h2>8. Dépannage</h2>
+  <details><summary>Le cadre n'apparaît jamais sur le marqueur</summary>
+    <p>Approcher davantage (un quart de l'écran), vérifier l'éclairage et l'absence de reflet, vérifier la taille imprimée à la règle et, pour la table et le bureau, le réglage <span class="kbd">⚙ → Taille des marqueurs</span>.</p></details>
+  <details><summary>Les repères sont décalés ou ont dérivé</summary>
+    <p>Revenir viser le marqueur (cadre vert) : l'appli se recale. Sinon <span class="kbd">⚙ → Réinitialiser le suivi</span>. Si le décalage est toujours le même, ce sont les positions qui sont à corriger : voir <a href="#placer">Placer les repères</a>.</p></details>
+  <details><summary>« Mouvement trop rapide » ou « Pas assez de lumière »</summary>
+    <p>Bouger plus lentement, éclairer la zone, éviter de viser une surface uniforme (mur blanc, tôle lisse).</p></details>
+  <details><summary>« Ce téléphone n'est pas compatible ARCore »</summary>
+    <p>Le téléphone n'est pas dans la liste Google. Utiliser un autre appareil compatible.</p></details>
+  <details><summary>L'installation est refusée (« appli non installée »)</summary>
+    <p>Vérifier qu'il reste de la place sur le téléphone. Si la version installée provient d'une autre source (signature différente), la désinstaller puis réinstaller.</p></details>
+  <details><summary>La caméra ne s'ouvre pas</summary>
+    <p>Fermer les autres applis qui utilisent la caméra. Vérifier l'autorisation : Paramètres Android → Applis → Atelier RA → Autorisations → Caméra.</p></details>
+</section>
+
+<section id="admin">
+  <h2>9. Administration</h2>
+  <p class="sub">Pour l'administrateur du portail.</p>
+  <h3>Configurer Firebase (comptes et base de données)</h3>
+  <ol class="steps">
+    <li>Sur <a href="https://console.firebase.google.com">console.firebase.google.com</a> : <b>Créer un projet</b> nommé <code>atelier-ra</code> (Google Analytics facultatif).</li>
+    <li>Icône <b>&lt;/&gt;</b> (application Web) → nom <code>portail</code>, sans Firebase Hosting → <b>Enregistrer</b>. Copier le bloc <code>firebaseConfig</code> (non secret).</li>
+    <li><b>Authentication</b> → Commencer → <b>Adresse e-mail/Mot de passe</b> → activer.</li>
+    <li>Authentication → Paramètres → <b>Domaines autorisés</b> → ajouter <code>ghepito.github.io</code>.</li>
+    <li><b>Firestore Database</b> → Créer → emplacement <b>europe-west9 (Paris)</b> → mode production.</li>
+    <li>Firestore → onglet <b>Règles</b> : coller les règles de sécurité fournies, puis <b>Publier</b>.</li>
+  </ol>
+  <h3>Publication de l'appli et du portail</h3>
+  <p>Le code est sur <a href="https://github.com/Ghepito/atelier-ra">GitHub</a>. Chaque modification recompile automatiquement l'APK (onglet <i>Actions</i>) et met à jour ce portail (GitHub Pages).</p>
+</section>
+
+</div>
+</div>
+</main>
+
+<footer></footer>
+<script src="assets/site.js"></script>
+<script>entete("tutos.html");</script>
+</body>
+</html>
