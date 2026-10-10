@@ -22,8 +22,12 @@ jobs:
       - uses: gradle/actions/setup-gradle@v5
 
       # Le SDK Android est préinstallé sur les machines GitHub (ANDROID_HOME).
-      - name: Accepter les licences Android
-        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
+      - name: Préparer le SDK Android
+        run: |
+          SDKM="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKM" --licenses > /dev/null || true
+          "$SDKM" --install "platforms;android-37" "build-tools;35.0.0" > /dev/null || true
+          ls "$ANDROID_HOME/platforms"
 
       - name: Compiler
         run: |
