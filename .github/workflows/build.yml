@@ -10,26 +10,52 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
-      - uses: android-actions/setup-android@v3
+      - uses: gradle/actions/setup-gradle@v5
 
-      - uses: gradle/actions/setup-gradle@v4
+      # Le SDK Android est préinstallé sur les machines GitHub (ANDROID_HOME).
+      - name: Accepter les licences Android
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null || true
 
       - name: Compiler
-        run: ./gradlew --no-daemon assembleDebug
+        run: |
+          set -o pipefail
+          chmod +x gradlew
+          ./gradlew --no-daemon --stacktrace assembleDebug 2>&1 | tee build.log
+
+      - name: Remonter les erreurs
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          touch build.log
+          # Résumé des erreurs en annotations (lisibles via l'API GitHub)
+          grep -E "^e: |error:|What went wrong|Could not|> |Execution failed|FAILED|Unresolved|Exception" build.log | head -60 > erreurs.txt || true
+          msg=$(sed ':a;N;$!ba;s/%/%25/g;s/\r//g;s/\n/%0A/g' erreurs.txt | cut -c1-60000)
+          echo "::error title=Erreurs de compilation::${msg}"
+          # Journal complet sur la branche journal-compilation
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          cp build.log /tmp/build.log
+          git checkout --orphan journal-compilation
+          git rm -rf --cached . > /dev/null
+          cp /tmp/build.log build.log
+          git add -f build.log
+          git commit -m "Journal de compilation ${GITHUB_SHA::7}" > /dev/null
+          git push -f origin journal-compilation
 
       - name: Renommer l'APK
         run: cp app/build/outputs/apk/debug/app-debug.apk AtelierRA.apk
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: AtelierRA-apk
           path: AtelierRA.apk
