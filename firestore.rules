@@ -1,0 +1,66 @@
+rules_version = '2';
+
+// Règles de sécurité Atelier RA — à coller dans Firebase : Firestore Database → Règles → Publier.
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function connecte() { return request.auth != null; }
+    function profil() { return get(/databases/$(db)/documents/users/$(request.auth.uid)).data; }
+    function role() {
+      return connecte() && exists(/databases/$(db)/documents/users/$(request.auth.uid)) ? profil().role : '';
+    }
+    function estAdmin() { return role() == 'admin'; }
+    function estFormateur() { return role() == 'formateur' || estAdmin(); }
+
+    // Profils : chacun crée le sien en « apprenant » ; seul l'administrateur change les rôles.
+    match /users/{uid} {
+      allow read: if connecte() && (request.auth.uid == uid || estFormateur());
+      allow create: if connecte() && request.auth.uid == uid
+        && request.resource.data.role == 'apprenant'
+        && request.resource.data.keys().hasOnly(['email', 'nom', 'role', 'classe', 'cree'])
+        && (request.resource.data.classe == null
+            || exists(/databases/$(db)/documents/classes/$(request.resource.data.classe)));
+      allow update: if estAdmin()
+        || (estFormateur() && resource.data.role == 'apprenant' && request.resource.data.role == 'apprenant')
+        || (request.auth.uid == uid && request.resource.data.role == resource.data.role);
+      allow delete: if estAdmin();
+    }
+
+    // Classes et codes d'accès
+    match /classes/{id} {
+      allow read: if connecte();
+      allow write: if estFormateur();
+    }
+    match /codes/{code} {
+      allow get: if connecte();
+      allow list: if estFormateur();
+      allow write: if estFormateur();
+    }
+
+    // Fiches machines (brouillons) : lues par tous les connectés, modifiées par les formateurs
+    match /machines/{id} {
+      allow read: if connecte();
+      allow write: if estFormateur();
+    }
+
+    // Propositions et relevés des apprenants
+    match /propositions/{id} {
+      allow create: if connecte()
+        && request.resource.data.auteur == request.auth.uid
+        && request.resource.data.statut == 'a_valider';
+      allow read: if connecte() && (resource.data.auteur == request.auth.uid || estFormateur());
+      allow update: if estFormateur()
+        || (resource.data.auteur == request.auth.uid && resource.data.statut != 'integree'
+            && request.resource.data.auteur == resource.data.auteur
+            && request.resource.data.statut == 'a_valider');
+      allow delete: if estFormateur()
+        || (resource.data.auteur == request.auth.uid && resource.data.statut != 'integree');
+    }
+
+    // Contenu publié : lu par l'appli sans connexion, écrit par les formateurs
+    match /publie/{doc} {
+      allow read: if true;
+      allow write: if estFormateur();
+    }
+  }
+}

@@ -72,6 +72,7 @@ class MainActivity : AppCompatActivity(), ArEvents {
     private lateinit var prox: TextView
     private lateinit var hint: TextView
     private lateinit var banner: TextView
+    private lateinit var bannerContenu: TextView
     private lateinit var arrows: ArrowView
     private lateinit var panel: LinearLayout
     private lateinit var fab: TextView
@@ -121,6 +122,7 @@ class MainActivity : AppCompatActivity(), ArEvents {
         renderer = ArRenderer(this, machines, store, rotationHelper, this)
         setContentView(buildUi())
         verifierMiseAJour()
+        verifierContenu()
     }
 
     // ------------------------------------------------------------------ Événements du rendu (fil OpenGL)
@@ -233,6 +235,12 @@ class MainActivity : AppCompatActivity(), ArEvents {
             visibility = View.GONE
         }
         haut.addView(banner, LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply { leftMargin = dpi(12); rightMargin = dpi(12) })
+        bannerContenu = text("", 13f, Color.parseColor("#04213D"), true).apply {
+            setPadding(dpi(14), dpi(9), dpi(14), dpi(9))
+            background = rounded(SPACE, 10f)
+            visibility = View.GONE
+        }
+        haut.addView(bannerContenu, LinearLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply { leftMargin = dpi(12); rightMargin = dpi(12); topMargin = dpi(6) })
         root.addView(haut, FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT, Gravity.TOP))
 
         // Aide centrale
@@ -523,6 +531,7 @@ class MainActivity : AppCompatActivity(), ArEvents {
             val col = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
             col.addView(text(p.ou, 14f, bold = true))
             col.addView(text(p.action, 13f, MUT))
+            if (p.infos.isNotBlank()) col.addView(text("ℹ ${p.infos}", 12.5f, TXT).apply { setPadding(0, dpi(3), 0, 0) })
             val tag = (if (p.type.isNotBlank()) p.type.uppercase() + "  ·  " else "") + "⟳ ${p.periode}" + if (store.estPlace(m.key, i)) "  ·  📍 placé" else ""
             col.addView(text(tag, 11f, TXT).apply {
                 setPadding(dpi(7), dpi(1), dpi(7), dpi(1))
@@ -662,7 +671,8 @@ class MainActivity : AppCompatActivity(), ArEvents {
             "Réinitialiser le suivi",
         )
         AlertDialog.Builder(this)
-            .setTitle("Réglages — version ${BuildConfig.VERSION_NAME}")
+            .setTitle("Réglages — appli ${BuildConfig.VERSION_NAME} · fiches " +
+                (prefs.getInt("contenu_version", 0).let { if (it > 0 && Machines.fichierPublie(this).exists()) "v$it" else "intégrées" }))
             .setItems(items) { _, which ->
                 when (which) {
                     0 -> choisirTaille()
@@ -774,6 +784,34 @@ class MainActivity : AppCompatActivity(), ArEvents {
         }
     }
 
+    /** Télécharge les fiches publiées depuis le portail ; propose de les appliquer si elles sont plus récentes. */
+    private fun verifierContenu() {
+        thread(isDaemon = true) {
+            try {
+                val url = "https://firestore.googleapis.com/v1/projects/atelier-ra/databases/(default)/documents/publie/contenu" +
+                        "?key=AIzaSyDsBpRo_4ICgHMMhReDO5ycB73BXxBjAKI"
+                val c = URL(url).openConnection() as HttpURLConnection
+                c.connectTimeout = 8000; c.readTimeout = 10000
+                if (c.responseCode != 200) return@thread
+                val champs = JSONObject(c.inputStream.bufferedReader().use { it.readText() }).getJSONObject("fields")
+                val version = champs.getJSONObject("version").optString("integerValue").toIntOrNull() ?: return@thread
+                if (version <= prefs.getInt("contenu_version", 0)) return@thread
+                val json = champs.getJSONObject("json").getString("stringValue")
+                val liste = Machines.parse(json)          // validation avant enregistrement
+                if (liste.isEmpty()) return@thread
+                Machines.fichierPublie(this).writeText(json, Charsets.UTF_8)
+                prefs.edit().putInt("contenu_version", version).apply()
+                runOnUiThread {
+                    bannerContenu.text = "↻  Fiches mises à jour (version $version) — touchez pour les afficher"
+                    bannerContenu.visibility = View.VISIBLE
+                    bannerContenu.setOnClickListener { recreate() }
+                }
+            } catch (e: Exception) {
+                Log.i("AtelierRA", "Contenu publié indisponible : ${e.message}")
+            }
+        }
+    }
+
     // ------------------------------------------------------------------ Cycle de vie ARCore
 
     override fun onResume() {
@@ -825,9 +863,13 @@ class MainActivity : AppCompatActivity(), ArEvents {
         val db = AugmentedImageDatabase(s)
         for (m in machines.values) {
             m.cibles.forEachIndexed { k, c ->
-                assets.open(c.image).use { input ->
-                    val bmp = BitmapFactory.decodeStream(input)
-                    db.addImage("${m.key}#$k", bmp, c.largeurCm?.let { it / 100f } ?: largeur)
+                try {
+                    assets.open(c.image).use { input ->
+                        val bmp = BitmapFactory.decodeStream(input)
+                        db.addImage("${m.key}#$k", bmp, c.largeurCm?.let { it / 100f } ?: largeur)
+                    }
+                } catch (e: Exception) {
+                    Log.w("AtelierRA", "Marqueur absent de l'appli : ${c.image}")
                 }
             }
         }

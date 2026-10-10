@@ -89,8 +89,7 @@ class Store(context: Context, private val machines: Map<String, Machine>) {
 
     // ---------- Export : machines.json avec les positions placées
     fun exporterJson(context: Context): String {
-        val txt = context.assets.open("machines.json").bufferedReader(Charsets.UTF_8).use { it.readText() }
-        val root = JSONObject(txt)
+        val root = JSONObject(Machines.texteCourant(context))
         val arr = root.getJSONArray("machines")
         for (k in 0 until arr.length()) {
             val o = arr.getJSONObject(k)

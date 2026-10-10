@@ -12,31 +12,28 @@
 <header class="top"></header>
 
 <main>
-  <section style="padding:48px 0 8px">
-    <div class="eyebrow">Espace connecté</div>
-    <h1 style="font-size:clamp(30px,4.4vw,44px)">Un espace, <em>trois rôles</em>.</h1>
-    <p class="lead">Connexion par e-mail. Les apprenants rejoignent leur classe avec un code fourni par le formateur. <span class="soon">mise en service en cours</span></p>
-  </section>
+  <div id="app"><p class="sub" style="padding:40px 0">Chargement…</p></div>
 
-  <div class="grid g3" style="margin-top:22px">
+  <section id="presentation">
+  <h2>Un espace, trois rôles</h2>
+  <p class="sub">Les apprenants s'inscrivent avec le <b>code classe</b> fourni par leur formateur.</p>
+  <div class="grid g3">
     <div class="card role">
       <div class="tag" style="color:var(--ok)">Apprenant</div>
-      <h3>Compléter, observer, proposer</h3>
+      <h3>Observer, relever, proposer</h3>
       <ul>
-        <li>Rejoindre sa classe avec un <b>code classe</b></li>
-        <li>Remplir des <b>fiches de relevé</b> devant la machine : plaque signalétique, référence, photo</li>
-        <li>Proposer des compléments aux fiches : point d'entretien, élément de chaîne, étape de procédure</li>
-        <li>Suivre le statut de ses propositions : à valider, intégrée, à reprendre</li>
+        <li>Fiches de relevé devant la machine : plaque, référence, photo</li>
+        <li>Propositions : point d'entretien, élément de chaîne, remarque</li>
+        <li>Suivi du statut : à valider, intégrée, à reprendre</li>
       </ul>
     </div>
     <div class="card role">
       <div class="tag" style="color:var(--acc)">Formateur</div>
       <h3>Valider et publier</h3>
       <ul>
-        <li>Créer ses classes et leurs codes</li>
-        <li>Valider, corriger ou renvoyer les propositions des apprenants</li>
-        <li>Éditer les fiches machines : repères, chaînes d'action et d'acquisition, sécurité</li>
-        <li><b>Publier</b> : l'appli récupère le contenu à jour au démarrage, sans réinstallation</li>
+        <li>Classes et codes d'accès</li>
+        <li>Validation des propositions, intégration en un clic</li>
+        <li>Édition des fiches machines, puis <b>publication</b> vers l'appli</li>
       </ul>
     </div>
     <div class="card role">
@@ -44,29 +41,17 @@
       <h3>Piloter le portail</h3>
       <ul>
         <li>Tout ce que fait un formateur</li>
-        <li>Attribuer les rôles (formateurs, administrateurs)</li>
-        <li>Ajouter des machines et commander leurs marqueurs</li>
-        <li>Suivre l'activité : complétude des fiches, relevés reçus</li>
+        <li>Attribution des rôles</li>
+        <li>Initialisation des fiches</li>
       </ul>
     </div>
   </div>
-
-  <h2>Le circuit d'une information</h2>
-  <p class="sub">De l'observation de l'apprenant à l'écran du téléphone.</p>
-  <div class="card">
-    <ol class="steps" style="margin:0">
-      <li><b>Relevé</b> — l'apprenant photographie la plaque du moto-réducteur M3 et saisit ses caractéristiques.</li>
-      <li><b>Validation</b> — le formateur vérifie, corrige si besoin, et rattache l'information au repère « Moto-réducteur dosage solide M3 ».</li>
-      <li><b>Publication</b> — un clic : la fiche PolyProd est mise à jour.</li>
-      <li><b>Sur le terrain</b> — au prochain démarrage, l'appli affiche la nouvelle information sur la machine, en réalité augmentée.</li>
-    </ol>
-  </div>
-
-  <div class="note" style="margin-top:24px">La connexion sera activée dès la configuration de la base de données terminée (voir <a href="tutos.html#admin">Administration</a>).</div>
+  </section>
 </main>
 
 <footer></footer>
 <script src="assets/site.js"></script>
 <script>entete("espace.html");</script>
+<script type="module" src="assets/espace.js"></script>
 </body>
 </html>

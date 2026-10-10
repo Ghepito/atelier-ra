@@ -1,0 +1,743 @@
+{
+  "_aide": "REPÈRE MACHINE (cm), origine = centre du marqueur principal : x vers la droite vu de face (+), y vers le haut (+), z vers l'avant/l'opérateur (+). Pour un marqueur à plat sur le dessus (bandeau HAUT vers le fond), c'est le repère du marqueur. cibles : liste de marqueurs {image, face (dessus|avant|arriere|gauche|droite), pos_cm, largeur_cm}. chaines : {titre, type (action|acquisition), intro, blocs [{titre, texte}], maillons [{bloc, nom, repere | pos_cm}]}. entretien : points {ou, action, periode, type, pos_cm}. Étapes de sécurité : texte ou {texte, repere}.",
+  "machines": [
+    {
+      "id": "table",
+      "code": "TAB-01",
+      "nom": "Table de travail",
+      "image": "cibles/cible-table.png",
+      "fonction": {
+        "intro": "Structure passive : pas de chaîne d'énergie, mais une chaîne de transmission des efforts.",
+        "blocs": [
+          {
+            "titre": "Recevoir",
+            "texte": "Plateau : reçoit les charges posées (outils, pièces, poste)."
+          },
+          {
+            "titre": "Transmettre",
+            "texte": "Ceinture et pieds : transmettent les efforts jusqu'au sol."
+          },
+          {
+            "titre": "Stabiliser",
+            "texte": "Patins réglables : rattrapent les défauts du sol, protègent le revêtement."
+          }
+        ]
+      },
+      "entretien": [
+        {
+          "ou": "Coin avant gauche — fixation du pied",
+          "action": "Contrôler le serrage de la visserie",
+          "periode": "6 mois",
+          "pos_cm": {
+            "x": -50,
+            "y": 0,
+            "z": 5
+          }
+        },
+        {
+          "ou": "Coin avant droit — patin réglable",
+          "action": "Vérifier l'horizontalité au niveau à bulle",
+          "periode": "12 mois",
+          "pos_cm": {
+            "x": 50,
+            "y": 0,
+            "z": 5
+          }
+        },
+        {
+          "ou": "Plateau",
+          "action": "Nettoyer, rechercher fissures et éclats",
+          "periode": "Hebdomadaire",
+          "pos_cm": {
+            "x": 0,
+            "y": 0,
+            "z": -30
+          }
+        }
+      ],
+      "securite": {
+        "titre": "Règles d'utilisation",
+        "etapes": [
+          "Charge maximale : 80 kg répartis (exemple).",
+          "Ne jamais monter ni s'asseoir sur la table.",
+          "Signaler tout jeu ou bruit au niveau des pieds.",
+          "Ne pas déplacer la table chargée."
+        ],
+        "note": "Contenu d'exemple — à remplacer par les données réelles de l'équipement."
+      },
+      "chaine": [
+        {
+          "bloc": 1,
+          "nom": "Plateau",
+          "repere": 3
+        },
+        {
+          "bloc": 2,
+          "nom": "Ceinture",
+          "pos_cm": {
+            "x": -45,
+            "y": -6,
+            "z": 0
+          }
+        },
+        {
+          "bloc": 2,
+          "nom": "Pied",
+          "pos_cm": {
+            "x": -50,
+            "y": -40,
+            "z": 5
+          }
+        },
+        {
+          "bloc": 3,
+          "nom": "Patin",
+          "pos_cm": {
+            "x": -50,
+            "y": -73,
+            "z": 5
+          }
+        }
+      ]
+    },
+    {
+      "id": "bureau",
+      "code": "BUR-01",
+      "nom": "Bureau avec poste informatique",
+      "image": "cibles/cible-bureau.png",
+      "fonction": {
+        "intro": "Chaîne d'énergie du poste (vue simplifiée) :",
+        "blocs": [
+          {
+            "titre": "Alimenter",
+            "texte": "Réseau 230 V AC via la prise murale."
+          },
+          {
+            "titre": "Distribuer",
+            "texte": "Multiprise avec interrupteur : commande l'ensemble du poste."
+          },
+          {
+            "titre": "Convertir",
+            "texte": "Alimentation de l'unité centrale : 230 V AC → 12 / 5 V DC."
+          },
+          {
+            "titre": "Agir",
+            "texte": "Écran, éclairage, ventilateurs : produisent l'effet attendu."
+          }
+        ]
+      },
+      "entretien": [
+        {
+          "ou": "Multiprise",
+          "action": "Contrôle visuel : câble, fiche, échauffement",
+          "periode": "6 mois",
+          "pos_cm": {
+            "x": -40,
+            "y": -70,
+            "z": -20
+          }
+        },
+        {
+          "ou": "Tiroir — glissières",
+          "action": "Lubrifier (lubrifiant sec PTFE)",
+          "periode": "12 mois",
+          "pos_cm": {
+            "x": 30,
+            "y": -5,
+            "z": 10
+          }
+        },
+        {
+          "ou": "Unité centrale — grille de ventilation",
+          "action": "Dépoussiérer",
+          "periode": "6 mois",
+          "pos_cm": {
+            "x": 50,
+            "y": -40,
+            "z": -10
+          }
+        }
+      ],
+      "securite": {
+        "titre": "Mise en sécurité avant intervention",
+        "etapes": [
+          {
+            "texte": "SÉPARER : éteindre la multiprise puis débrancher la fiche de la prise murale.",
+            "repere": 1
+          },
+          {
+            "texte": "CONDAMNER : garder la fiche sous son contrôle, visible depuis le poste d'intervention.",
+            "repere": 1
+          },
+          {
+            "texte": "IDENTIFIER : s'assurer que c'est bien la fiche du poste concerné."
+          },
+          {
+            "texte": "VÉRIFIER : tenter une mise en marche — rien ne doit s'allumer."
+          }
+        ],
+        "note": "Exemple pédagogique : l'affichage en réalité augmentée ne remplace ni la procédure officielle de consignation, ni l'habilitation."
+      },
+      "chaine": [
+        {
+          "bloc": 1,
+          "nom": "Prise murale",
+          "pos_cm": {
+            "x": -60,
+            "y": -75,
+            "z": -35
+          }
+        },
+        {
+          "bloc": 2,
+          "nom": "Multiprise",
+          "repere": 1
+        },
+        {
+          "bloc": 3,
+          "nom": "Alimentation PC",
+          "repere": 3
+        },
+        {
+          "bloc": 4,
+          "nom": "Écran",
+          "pos_cm": {
+            "x": 10,
+            "y": 30,
+            "z": -25
+          }
+        }
+      ]
+    },
+    {
+      "id": "polyprod",
+      "code": "POL-01",
+      "nom": "PolyProd — ERM Automatismes",
+      "cibles": [
+        {
+          "image": "cibles/cible-polyprod-av.png",
+          "face": "avant",
+          "pos_cm": {
+            "x": 0,
+            "y": 0,
+            "z": 0
+          },
+          "largeur_cm": 12
+        },
+        {
+          "image": "cibles/cible-polyprod-ar.png",
+          "face": "arriere",
+          "pos_cm": {
+            "x": 0,
+            "y": 0,
+            "z": -112
+          },
+          "largeur_cm": 12
+        }
+      ],
+      "entretien": [
+        {
+          "ou": "Sectionneur général (armoire)",
+          "action": "Essai de manœuvre ; vérifier le dispositif de cadenassage",
+          "periode": "12 mois",
+          "type": "sécurité",
+          "pos_cm": {
+            "x": 110,
+            "y": -45,
+            "z": 0
+          }
+        },
+        {
+          "ou": "Arrêt d'urgence (pupitre)",
+          "action": "Test fonctionnel : coupure puis réarmement via le relais Preventa",
+          "periode": "Mensuel",
+          "type": "sécurité",
+          "pos_cm": {
+            "x": 118,
+            "y": 35,
+            "z": 8
+          }
+        },
+        {
+          "ou": "Pupitre tactile (IHM)",
+          "action": "Nettoyer l'écran ; vérifier l'absence de défaut affiché",
+          "periode": "Hebdomadaire",
+          "type": "commande",
+          "pos_cm": {
+            "x": 105,
+            "y": 35,
+            "z": 8
+          }
+        },
+        {
+          "ou": "Automate M340 et variateurs (armoire)",
+          "action": "Voyants RUN/ERR, sauvegarde du programme, dépoussiérage de l'armoire",
+          "periode": "6 mois",
+          "type": "commande",
+          "pos_cm": {
+            "x": 85,
+            "y": -55,
+            "z": -5
+          }
+        },
+        {
+          "ou": "Unité de traitement de l'air + démarreur progressif",
+          "action": "Purger le filtre, contrôler la pression (6–7 bar), état de la cartouche",
+          "periode": "Hebdomadaire",
+          "type": "énergie",
+          "pos_cm": {
+            "x": -125,
+            "y": -25,
+            "z": -15
+          }
+        },
+        {
+          "ou": "Îlot de distributeurs AS-i",
+          "action": "Contrôler fuites, voyants des bobines, raccords",
+          "periode": "Mensuel",
+          "type": "préactionneur",
+          "pos_cm": {
+            "x": 0,
+            "y": 15,
+            "z": -85
+          }
+        },
+        {
+          "ou": "Convoyeur à palettes — moto-réducteur",
+          "action": "Tension et état de la chaîne, nettoyage des palettes, bruit du moto-réducteur",
+          "periode": "Mensuel",
+          "type": "actionneur",
+          "pos_cm": {
+            "x": -130,
+            "y": 0,
+            "z": -35
+          }
+        },
+        {
+          "ou": "Vérin « Entrée sas de dosage »",
+          "action": "Fixations, fuites, réglage des détecteurs de fin de course (ILS)",
+          "periode": "3 mois",
+          "type": "actionneur",
+          "pos_cm": {
+            "x": -80,
+            "y": 5,
+            "z": -25
+          }
+        },
+        {
+          "ou": "Vérin « Arrêt en position dosage »",
+          "action": "Fixations, fuites, réglage des ILS",
+          "periode": "3 mois",
+          "type": "actionneur",
+          "pos_cm": {
+            "x": -45,
+            "y": 5,
+            "z": -25
+          }
+        },
+        {
+          "ou": "Pompe doseuse à membrane + cuve liquide",
+          "action": "Nettoyer cuve et circuit ; contrôler la membrane et le bec verseur",
+          "periode": "Mensuel",
+          "type": "actionneur",
+          "pos_cm": {
+            "x": -55,
+            "y": 55,
+            "z": -50
+          }
+        },
+        {
+          "ou": "Capteur niveau cuve liquide",
+          "action": "Nettoyer la face sensible, tester la détection",
+          "periode": "Mensuel",
+          "type": "capteur",
+          "pos_cm": {
+            "x": -55,
+            "y": 80,
+            "z": -50
+          }
+        },
+        {
+          "ou": "Trémie produit solide + capteur niveau B17",
+          "action": "Vider, nettoyer les fenêtres ; tester B17 (capacitif PNP, NO)",
+          "periode": "Mensuel",
+          "type": "capteur",
+          "pos_cm": {
+            "x": -10,
+            "y": 85,
+            "z": -50
+          }
+        },
+        {
+          "ou": "Moto-réducteur dosage solide M3",
+          "action": "Bruit / vibrations ; roulements 6006, joints SPI 30×45×7 ; vidange du réducteur",
+          "periode": "6 mois",
+          "type": "actionneur",
+          "pos_cm": {
+            "x": -10,
+            "y": 50,
+            "z": -60
+          }
+        },
+        {
+          "ou": "Codeur rotation vis B19",
+          "action": "Distance capteur inductif / disque perforé ; contrôle du comptage",
+          "periode": "3 mois",
+          "type": "capteur",
+          "pos_cm": {
+            "x": 0,
+            "y": 45,
+            "z": -45
+          }
+        },
+        {
+          "ou": "Vérin obturateur sortie solide 5A9",
+          "action": "Retour ressort (simple effet) et étanchéité",
+          "periode": "3 mois",
+          "type": "actionneur",
+          "pos_cm": {
+            "x": -10,
+            "y": 25,
+            "z": -30
+          }
+        },
+        {
+          "ou": "Table de distribution des bouchons",
+          "action": "Nettoyage ; limiteur de couple et réglage des guides",
+          "periode": "Mensuel",
+          "type": "actionneur",
+          "pos_cm": {
+            "x": 50,
+            "y": 20,
+            "z": -60
+          }
+        },
+        {
+          "ou": "Pick & place — vérin et ventouse (venturi)",
+          "action": "État de la ventouse, niveau de vide, nettoyage du venturi",
+          "periode": "Mensuel",
+          "type": "actionneur",
+          "pos_cm": {
+            "x": 80,
+            "y": 40,
+            "z": -30
+          }
+        },
+        {
+          "ou": "Moteur pneumatique de vissage",
+          "action": "Couple de vissage, état de la tête de préhension",
+          "periode": "3 mois",
+          "type": "actionneur",
+          "pos_cm": {
+            "x": 88,
+            "y": 30,
+            "z": -25
+          }
+        }
+      ],
+      "chaines": [
+        {
+          "titre": "Action — dosage solide",
+          "type": "action",
+          "intro": "Chaîne d'action électrique : la vis d'Archimède dose le produit solide dans le pot.",
+          "blocs": [
+            {
+              "titre": "Alimenter",
+              "texte": "Réseau 400 V triphasé + N, via le sectionneur général et le disjoncteur moteur Q1."
+            },
+            {
+              "titre": "Distribuer",
+              "texte": "Contacteur KM3 et variateur Schneider ATV320 : vitesse selon le produit (830, 1820 ou 1040 tr/min)."
+            },
+            {
+              "titre": "Convertir",
+              "texte": "Moteur asynchrone triphasé M3 (0,18 kW, 3,3 A)."
+            },
+            {
+              "titre": "Transmettre",
+              "texte": "Réducteur roue et vis sans fin, arbre de sortie."
+            },
+            {
+              "titre": "Agir",
+              "texte": "Vis d'Archimède : entraîne le produit de la trémie vers la tête de dosage."
+            }
+          ],
+          "maillons": [
+            {
+              "bloc": 1,
+              "nom": "Sectionneur",
+              "repere": 1
+            },
+            {
+              "bloc": 2,
+              "nom": "KM3 / ATV320",
+              "repere": 4
+            },
+            {
+              "bloc": 3,
+              "nom": "Moteur M3",
+              "repere": 13
+            },
+            {
+              "bloc": 4,
+              "nom": "Réducteur",
+              "pos_cm": {
+                "x": -10,
+                "y": 42,
+                "z": -55
+              }
+            },
+            {
+              "bloc": 5,
+              "nom": "Vis d'Archimède",
+              "pos_cm": {
+                "x": -10,
+                "y": 35,
+                "z": -45
+              }
+            }
+          ]
+        },
+        {
+          "titre": "Action — obturateur solide",
+          "type": "action",
+          "intro": "Chaîne d'action pneumatique : ouverture et fermeture de la sortie du produit solide.",
+          "blocs": [
+            {
+              "titre": "Alimenter",
+              "texte": "Air comprimé (6 à 7 bar) traité par l'unité FRL avec démarreur progressif."
+            },
+            {
+              "titre": "Distribuer",
+              "texte": "Distributeur de l'îlot AS-i commandé par l'automate."
+            },
+            {
+              "titre": "Convertir",
+              "texte": "Vérin simple effet 5A9 (retour par ressort)."
+            },
+            {
+              "titre": "Agir",
+              "texte": "Obturateur : libère ou bloque le produit en sortie de goulotte."
+            }
+          ],
+          "maillons": [
+            {
+              "bloc": 1,
+              "nom": "Unité FRL",
+              "repere": 5
+            },
+            {
+              "bloc": 2,
+              "nom": "Îlot AS-i",
+              "repere": 6
+            },
+            {
+              "bloc": 3,
+              "nom": "Vérin 5A9",
+              "repere": 15
+            },
+            {
+              "bloc": 4,
+              "nom": "Obturateur",
+              "pos_cm": {
+                "x": -10,
+                "y": 18,
+                "z": -30
+              }
+            }
+          ]
+        },
+        {
+          "titre": "Acquisition — dosage solide",
+          "type": "acquisition",
+          "intro": "Chaîne d'acquisition : l'automate compte les tours de vis pour arrêter le dosage à la bonne quantité.",
+          "blocs": [
+            {
+              "titre": "Acquérir",
+              "texte": "B19, détecteur inductif M8, compte les trous du disque perforé de la vis. B17 (capacitif) surveille le niveau de la trémie."
+            },
+            {
+              "titre": "Traiter",
+              "texte": "Automate Schneider M340 : compare le nombre d'impulsions à la consigne du produit."
+            },
+            {
+              "titre": "Communiquer",
+              "texte": "Ordres vers les préactionneurs (bus AS-i, KM3) ; état et défauts affichés sur le pupitre."
+            }
+          ],
+          "maillons": [
+            {
+              "bloc": 1,
+              "nom": "B19",
+              "repere": 14
+            },
+            {
+              "bloc": 2,
+              "nom": "Automate M340",
+              "repere": 4
+            },
+            {
+              "bloc": 3,
+              "nom": "Pupitre",
+              "repere": 3
+            }
+          ]
+        },
+        {
+          "titre": "Action — prise du bouchon",
+          "type": "action",
+          "intro": "Chaîne d'action pneumatique avec génération de vide : la ventouse saisit le bouchon.",
+          "blocs": [
+            {
+              "titre": "Alimenter",
+              "texte": "Air comprimé traité (unité FRL)."
+            },
+            {
+              "titre": "Distribuer",
+              "texte": "Distributeur de l'îlot AS-i."
+            },
+            {
+              "titre": "Convertir",
+              "texte": "Venturi : transforme le débit d'air en dépression."
+            },
+            {
+              "titre": "Agir",
+              "texte": "Ventouse plate : saisit le bouchon sur la table de distribution."
+            }
+          ],
+          "maillons": [
+            {
+              "bloc": 1,
+              "nom": "Unité FRL",
+              "repere": 5
+            },
+            {
+              "bloc": 2,
+              "nom": "Îlot AS-i",
+              "repere": 6
+            },
+            {
+              "bloc": 3,
+              "nom": "Venturi",
+              "pos_cm": {
+                "x": 80,
+                "y": 55,
+                "z": -35
+              }
+            },
+            {
+              "bloc": 4,
+              "nom": "Ventouse",
+              "repere": 17
+            }
+          ]
+        },
+        {
+          "titre": "Action — convoyeur",
+          "type": "action",
+          "intro": "Chaîne d'action électrique : le convoyeur à chaîne déplace les palettes porte-récipients.",
+          "blocs": [
+            {
+              "titre": "Alimenter",
+              "texte": "Réseau 400 V triphasé via le sectionneur général."
+            },
+            {
+              "titre": "Distribuer",
+              "texte": "Variateur du convoyeur (vitesse réglable)."
+            },
+            {
+              "titre": "Convertir",
+              "texte": "Moto-réducteur asynchrone triphasé."
+            },
+            {
+              "titre": "Transmettre",
+              "texte": "Chaîne du convoyeur."
+            },
+            {
+              "titre": "Agir",
+              "texte": "Palettes : déplacent pots et flacons de poste en poste."
+            }
+          ],
+          "maillons": [
+            {
+              "bloc": 1,
+              "nom": "Sectionneur",
+              "repere": 1
+            },
+            {
+              "bloc": 2,
+              "nom": "Variateur",
+              "repere": 4
+            },
+            {
+              "bloc": 3,
+              "nom": "Moto-réducteur",
+              "repere": 7
+            },
+            {
+              "bloc": 4,
+              "nom": "Chaîne",
+              "pos_cm": {
+                "x": -60,
+                "y": 2,
+                "z": -30
+              }
+            },
+            {
+              "bloc": 5,
+              "nom": "Palette",
+              "pos_cm": {
+                "x": 0,
+                "y": 5,
+                "z": -30
+              }
+            }
+          ]
+        }
+      ],
+      "securite": {
+        "titre": "Consignation électrique et pneumatique (exemple)",
+        "etapes": [
+          {
+            "texte": "ARRÊTER le cycle depuis le pupitre et attendre l'arrêt complet de tous les mouvements.",
+            "repere": 3
+          },
+          {
+            "texte": "PRÉ-IDENTIFIER les organes de séparation : sectionneur général et vanne d'isolement pneumatique de la PolyProd."
+          },
+          {
+            "texte": "SÉPARER (électrique) : ouvrir le sectionneur général.",
+            "repere": 1
+          },
+          {
+            "texte": "CONDAMNER : cadenas personnel + pancarte « Ne pas manœuvrer — consignation en cours ».",
+            "repere": 1
+          },
+          {
+            "texte": "SÉPARER (pneumatique) : fermer la vanne d'isolement de l'unité de traitement de l'air.",
+            "repere": 5
+          },
+          {
+            "texte": "PURGER l'énergie pneumatique résiduelle (manomètre à 0) et caler les charges pouvant descendre (vérin du pick & place).",
+            "repere": 5
+          },
+          {
+            "texte": "CONDAMNER la vanne pneumatique en position fermée (cadenas).",
+            "repere": 5
+          },
+          {
+            "texte": "IDENTIFIER : s'assurer que les organes séparés sont bien ceux de la zone d'intervention."
+          },
+          {
+            "texte": "VAT : vérifier l'absence de tension au plus près de la zone (personne habilitée, VAT contrôlé avant et après)."
+          },
+          {
+            "texte": "VÉRIFIER l'absence d'énergie pneumatique : tenter une commande manuelle, aucun mouvement ne doit se produire.",
+            "repere": 17
+          }
+        ],
+        "note": "Exemple pédagogique (NF C 18-510 pour l'électrique) : il ne remplace ni la procédure de consignation de l'établissement, ni le niveau d'habilitation requis. Repères et caractéristiques d'après les ressources ERM / éduscol : à vérifier sur votre machine."
+      }
+    }
+  ]
+}

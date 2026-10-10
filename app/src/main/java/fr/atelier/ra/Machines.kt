@@ -22,6 +22,8 @@ data class PointEntretien(
     val zCm: Float,
     /** actionneur, capteur, préactionneur, commande, sécurité, énergie… (facultatif) */
     val type: String = "",
+    /** Informations complémentaires (caractéristiques relevées…) */
+    val infos: String = "",
 )
 
 data class Bloc(val titre: String, val texte: String)
@@ -96,8 +98,26 @@ object Machines {
     private fun blocs(a: org.json.JSONArray): List<Bloc> =
         (0 until a.length()).map { Bloc(a.getJSONObject(it).getString("titre"), a.getJSONObject(it).getString("texte")) }
 
-    fun load(context: Context): List<Machine> {
-        val txt = context.assets.open("machines.json").bufferedReader(Charsets.UTF_8).use { it.readText() }
+    /** Fichier du contenu publié depuis le portail (téléchargé au démarrage). */
+    fun fichierPublie(context: Context) = java.io.File(context.filesDir, "contenu.json")
+
+    /** Texte du contenu en vigueur : publié s'il existe et est valide, sinon celui intégré à l'APK. */
+    fun texteCourant(context: Context): String {
+        val f = fichierPublie(context)
+        if (f.exists()) {
+            val t = f.readText(Charsets.UTF_8)
+            try { if (parse(t).isNotEmpty()) return t } catch (_: Exception) {}
+        }
+        return context.assets.open("machines.json").bufferedReader(Charsets.UTF_8).use { it.readText() }
+    }
+
+    fun load(context: Context): List<Machine> = try {
+        parse(texteCourant(context))
+    } catch (e: Exception) {
+        parse(context.assets.open("machines.json").bufferedReader(Charsets.UTF_8).use { it.readText() })
+    }
+
+    fun parse(txt: String): List<Machine> {
         val root = JSONObject(txt).getJSONArray("machines")
         return (0 until root.length()).map { i ->
             val o = root.getJSONObject(i)
@@ -143,6 +163,7 @@ object Machines {
                         p.getString("ou"), p.getString("action"), p.getString("periode"),
                         pos.getDouble("x").toFloat(), pos.getDouble("y").toFloat(), pos.getDouble("z").toFloat(),
                         p.optString("type"),
+                        p.optString("infos"),
                     )
                 }
             }
