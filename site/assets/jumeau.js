@@ -46,13 +46,13 @@ export function creerJumeau(el, opts) {
   const scene = new THREE.Scene();
   scene.background = new THREE.Color("#E6EBEE");
   const camera = new THREE.PerspectiveCamera(38, el.clientWidth / el.clientHeight, 1, 5000);
-  const cible = new THREE.Vector3(0, 30, -56);
+  const cible = new THREE.Vector3(...(modele.centre || [0, 30, -56]));
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true; controls.target.copy(cible);
   controls.maxPolarAngle = Math.PI * 0.52;
 
-  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a949b, 1.1));
-  const sun = new THREE.DirectionalLight(0xffffff, 1.4); sun.position.set(-220, 320, 260); scene.add(sun);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a949b, 1.7));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.9); sun.position.set(-220, 320, 260); scene.add(sun);
   const grid = new THREE.GridHelper(500, 50, 0x9aa5ad, 0xc9d1d6); grid.position.y = modele.sol ?? -75; scene.add(grid);
 
   // ---- Pièces de la maquette
@@ -64,7 +64,7 @@ export function creerJumeau(el, opts) {
     else if (p.t === "cone") geo = new THREE.CylinderGeometry(p.r1, p.r2, p.h, 32);
     else continue;
     const op = p.op ?? 1;
-    const mat = new THREE.MeshStandardMaterial({ color: p.col, roughness: 0.65, metalness: 0.12, transparent: op < 1, opacity: op, depthWrite: op >= 1 });
+    const mat = new THREE.MeshStandardMaterial({ color: p.col, roughness: 0.6, metalness: 0.05, transparent: op < 1, opacity: op, depthWrite: op >= 1 });
     const m = new THREE.Mesh(geo, mat);
     m.position.set(p.c[0], p.c[1], p.c[2]);
     if (p.t === "cyl" && p.axe === "x") m.rotation.z = Math.PI / 2;
@@ -151,9 +151,9 @@ export function creerJumeau(el, opts) {
 
   // ---- Vues
   function vue(nom) {
-    const d = 420;
-    const pos = { iso: [-230, 170, 290], face: [0, 40, d], gauche: [-d, 40, -56], droite: [d, 40, -56], dessus: [0, d + 60, -50], arriere: [0, 40, -56 - d] }[nom] || [-230, 170, 290];
-    camera.position.set(pos[0], pos[1], pos[2]); controls.target.copy(cible); controls.update();
+    const d = 460, [cx, cy, cz] = cible.toArray();
+    const rel = { iso: [-250, 130, 320], face: [0, 10, d], gauche: [-d, 10, 0], droite: [d, 10, 0], dessus: [0, d + 60, 6], arriere: [0, 10, -d] }[nom] || [-250, 130, 320];
+    camera.position.set(cx + rel[0], cy + rel[1], cz + rel[2]); controls.target.copy(cible); controls.update();
   }
   vue("iso");
 

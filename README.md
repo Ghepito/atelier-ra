@@ -39,7 +39,9 @@ Une nouvelle version s'installe par-dessus l'ancienne.
 
 ## Équipements
 - **TAB-01** table, **BUR-01** bureau : marqueur à plat sur le dessus (exemples).
-- **POL-01 PolyProd (ERM)** : deux marqueurs verticaux de 12 cm, avant et arrière ; 18 repères (sécurité, commande,
+- **POL-01 PolyProd (ERM)** : deux marqueurs verticaux de 12 cm collés sur l'armoire électrique : **AV** sur sa face avant
+  sous l'affiche « Consignes de sécurité » (origine du repère, ≈ 1,18 m du sol), **G** sur son flanc gauche au-dessus du
+  sectionneur (≈ 1,65 m). Maquette 3D du portail refaite d'après des photos in situ ; 18 repères (sécurité, commande,
   énergie, préactionneurs, actionneurs, capteurs) ; 5 chaînes (action : dosage solide, obturateur, prise du bouchon,
   convoyeur ; acquisition : dosage solide) ; consignation électrique + pneumatique guidée.
   Les positions sont approximatives : les caler avec le mode placement 📍.
